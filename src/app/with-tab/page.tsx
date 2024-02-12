@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  Container,
-  Icon,
-  IconButton,
-  Tab,
-  Tabs,
-} from "@mui/material";
+import { Box, Button, Container, Tab, Tabs } from "@mui/material";
 import { type ReactNode, useState } from "react";
 import { DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";

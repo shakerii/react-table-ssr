@@ -21,7 +21,7 @@ export const TextFilterInput = <TData,>({ column }: Props<TData>) => {
       fullWidth
       value={(columnFilterValue ?? "") as string}
       onChange={handleChange}
-      placeholder={`Search...`}
+      placeholder="Search"
     />
   );
 };
