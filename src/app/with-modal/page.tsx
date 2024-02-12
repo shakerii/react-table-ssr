@@ -12,13 +12,14 @@ import {
 } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useState } from "react";
+import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { api } from "~/trpc/react";
 import { columns } from "~/utils/columns";
 
 export default function Home() {
-  const [product, setProduct] = useState<Product | undefined | null>(null);
+  const [product, setProduct] = useState<Product | undefined | null>(undefined);
   const open = product !== undefined;
   const [fullWidth, setFullWidth] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
@@ -63,7 +64,11 @@ export default function Home() {
   const { data } = getAllProductQuery;
 
   return (
-    <Container sx={{ my: 4 }}>
+    <Container className="my-4">
+      <Breadcrumbs
+        links={[{ title: "Home", href: "/" }]}
+        current="With Modal"
+      />
       <Dialog
         fullWidth={fullWidth}
         fullScreen={fullScreen}

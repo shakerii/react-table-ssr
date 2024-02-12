@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <Container sx={{ my: 4 }}>
+    <Container className="my-4">
       <List>
         <ListItem>
           <Link href="/with-modal">With Modal</Link>

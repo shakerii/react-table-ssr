@@ -49,8 +49,15 @@ export const ProductForm = ({ defaultValues, onSubmit }: Props) => {
           {...register("description")}
         />
       </FormGroup>
-      <FormGroup>
-        <Button type="submit">Save</Button>
+      <FormGroup className="flex items-end">
+        <Button
+          className="w-fit"
+          variant="outlined"
+          color="primary"
+          type="submit"
+        >
+          Save
+        </Button>
       </FormGroup>
     </Box>
   );

@@ -4,12 +4,7 @@ export const Header = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-        >
+        <Typography variant="h6" noWrap component="div">
           React Table with SSR
         </Typography>
       </Toolbar>

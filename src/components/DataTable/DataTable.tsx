@@ -173,7 +173,7 @@ export const DataTable = <TData,>({
           </Box>
           <Box>{GlobalActions}</Box>
         </Box>
-        <Table sx={{ mt: 2 }}>
+        <Table className="mt-2">
           <TableHead>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
