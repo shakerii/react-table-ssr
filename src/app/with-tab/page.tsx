@@ -1,6 +1,14 @@
 "use client";
 
-import { Box, Button, Container, IconButton, Tab, Tabs } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Icon,
+  IconButton,
+  Tab,
+  Tabs,
+} from "@mui/material";
 import { type ReactNode, useState } from "react";
 import { DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
@@ -27,12 +35,25 @@ export default function Home() {
     },
   });
 
+  const updatePropertyMutation = api.product.update.useMutation({
+    onSuccess: async () => {
+      await getAllProductQuery.refetch();
+    },
+  });
+
+  const deletePropertyMutation = api.product.delete.useMutation({
+    onSuccess: async () => {
+      await getAllProductQuery.refetch();
+    },
+  });
+
   const [selectedTab, setSelectedTab] = useState(-1);
   const [tabs, setTabs] = useState<TabContext[]>([]);
 
   const openTab = (tab: TabContext) => {
     setTabs((tabs) => [...tabs, tab]);
     setSelectedTab(tabs.length);
+    return tabs.length;
   };
 
   const closeTab = (index: number) => {
@@ -74,13 +95,11 @@ export default function Home() {
               label={
                 <Box>
                   {tab.label}
-                  <IconButton
-                    sx={{ p: 0, ml: 1 }}
+                  <CloseIcon
+                    fontSize="small"
                     color="inherit"
                     onClick={() => closeTab(index)}
-                  >
-                    <CloseIcon fontSize="small" />
-                  </IconButton>
+                  />
                 </Box>
               }
             />
@@ -93,23 +112,55 @@ export default function Home() {
           data={data}
           GlobalActions={
             <Button
-              onClick={() =>
-                openTab({
+              onClick={() => {
+                const tabIndex = openTab({
                   key: (uuid as () => string)(),
-                  label: "Create New - " + Math.floor(Math.random() * 100),
+                  label: "Create New",
                   content: (
                     <ProductForm
-                      onSubmit={(values) =>
-                        createPropertyMutation.mutate(values)
-                      }
+                      onSubmit={async (values) => {
+                        await createPropertyMutation.mutateAsync(values);
+                        closeTab(tabIndex);
+                      }}
                     />
                   ),
-                })
-              }
+                });
+              }}
             >
               Create New
             </Button>
           }
+          RowActions={({ row }) => (
+            <Box display="flex">
+              <Button
+                onClick={() => {
+                  const tabIndex = openTab({
+                    key: (uuid as () => string)(),
+                    label: "Update",
+                    content: (
+                      <ProductForm
+                        defaultValues={row.original}
+                        onSubmit={async (values) => {
+                          await updatePropertyMutation.mutateAsync({
+                            id: row.original.id,
+                            ...values,
+                          });
+                          closeTab(tabIndex);
+                        }}
+                      />
+                    ),
+                  });
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                onClick={() => deletePropertyMutation.mutate(row.original.id)}
+              >
+                Delete
+              </Button>
+            </Box>
+          )}
         />
       </Box>
       {tabs.map((tab, index) => (

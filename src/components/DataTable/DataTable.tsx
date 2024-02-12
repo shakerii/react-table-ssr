@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  type Row,
   type ColumnFiltersState,
   type ColumnOrderState,
   type GroupingState,
@@ -31,7 +32,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, type FC } from "react";
 import type { Columns } from "./types";
 import { HeaderCell } from "./HeaderCell";
 import { fuzzyFilter, fuzzySort, getTableCellBackgroundColor } from "./utils";
@@ -45,12 +46,14 @@ type Props<TData> = {
   data: TData[];
   columns: Columns<TData>;
   GlobalActions?: ReactNode;
+  RowActions?: FC<{ row: Row<TData> }>;
 };
 
 export const DataTable = <TData,>({
   data,
   columns,
   GlobalActions,
+  RowActions,
 }: Props<TData>) => {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
@@ -125,6 +128,7 @@ export const DataTable = <TData,>({
                   {headerGroup.headers.map((header) => (
                     <HeaderCell key={header.id} header={header} table={table} />
                   ))}
+                  {RowActions && <TableCell />}
                 </TableRow>
               ))}
             </TableHead>
@@ -188,6 +192,9 @@ export const DataTable = <TData,>({
                       )}
                     </TableCell>
                   ))}
+                  {RowActions && (
+                    <TableCell>{<RowActions row={row} />}</TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
