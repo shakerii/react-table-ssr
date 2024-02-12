@@ -1,68 +1,17 @@
-"use client";
-
-import { Container } from "@mui/material";
-import type { Product } from "@prisma/client";
-import { type Columns, DataTable } from "~/components/DataTable";
-import { api } from "~/trpc/react";
-
-const columns: Columns<Product> = [
-  {
-    id: "name",
-    accessorKey: "name",
-    header: "Name",
-    cell: ({ cell }) => (
-      <span className="block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap">
-        {cell.getValue<string | undefined>()}
-      </span>
-    ),
-    filterFn: "includesString",
-  },
-  {
-    id: "description",
-    accessorKey: "description",
-    header: "Description",
-    cell: ({ cell }) => (
-      <span className="block max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
-        {cell.getValue<string | undefined>()}
-      </span>
-    ),
-    filterFn: "includesString",
-  },
-  {
-    id: "createdAt",
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
-    aggregatedCell: undefined,
-    filterFn: "auto",
-  },
-  {
-    id: "updatedAt",
-    accessorKey: "updatedAt",
-    header: "Updated At",
-    cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
-    aggregatedCell: undefined,
-    filterFn: "auto",
-  },
-];
+import { Container, List, ListItem } from "@mui/material";
+import Link from "next/link";
 
 export default function Home() {
-  const getAllProductQuery = api.product.getAll.useQuery(undefined, {
-    refetchInterval: false,
-    refetchOnWindowFocus: false,
-  });
-
-  if (getAllProductQuery.status === "loading") {
-    return "Loading";
-  }
-
-  if (getAllProductQuery.status === "error") {
-    return "Error";
-  }
-
   return (
     <Container sx={{ my: 4 }}>
-      <DataTable columns={columns} data={getAllProductQuery.data} />
+      <List>
+        <ListItem>
+          <Link href="/with-modal">With Modal</Link>
+        </ListItem>
+        <ListItem>
+          <Link href="/with-tab">With Tab</Link>
+        </ListItem>
+      </List>
     </Container>
   );
 }

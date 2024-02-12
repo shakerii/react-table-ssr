@@ -1,4 +1,7 @@
+"use client";
+
 import {
+  Box,
   Checkbox,
   Grid,
   Paper,
@@ -28,7 +31,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import type { Columns } from "./types";
 import { HeaderCell } from "./HeaderCell";
 import { fuzzyFilter, fuzzySort, getTableCellBackgroundColor } from "./utils";
@@ -41,9 +44,14 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 type Props<TData> = {
   data: TData[];
   columns: Columns<TData>;
+  GlobalActions?: ReactNode;
 };
 
-export const DataTable = <TData,>({ data, columns }: Props<TData>) => {
+export const DataTable = <TData,>({
+  data,
+  columns,
+  GlobalActions,
+}: Props<TData>) => {
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
   );
@@ -91,12 +99,17 @@ export const DataTable = <TData,>({ data, columns }: Props<TData>) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Grid>
-        <DebouncedInput
-          label="Filter All..."
-          value={globalFilter}
-          onChange={(value) => setGlobalFilter(value as string)}
-        />
+      <Box>
+        <Grid container alignItems="center">
+          <Grid item flex={1}>
+            <DebouncedInput
+              label="Filter All..."
+              value={globalFilter}
+              onChange={(value) => setGlobalFilter(value as string)}
+            />
+          </Grid>
+          <Grid item>{GlobalActions}</Grid>
+        </Grid>
         <TableContainer component={Paper} sx={{ mt: 4 }}>
           <Table>
             <TableHead>
@@ -191,7 +204,7 @@ export const DataTable = <TData,>({ data, columns }: Props<TData>) => {
             }
           />
         </TableContainer>
-      </Grid>
+      </Box>
     </DndProvider>
   );
 };
