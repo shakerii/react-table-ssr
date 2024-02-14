@@ -1,4 +1,5 @@
 {
   "cSpell.words": ["hookform", "jspdf", "tanstack", "TRPC"],
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "i18n-ally.localesPaths": ["messages"]
 }

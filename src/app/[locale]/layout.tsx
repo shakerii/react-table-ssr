@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 
 import { Header } from "./_components/Header";
+import { useTextDirection } from "~/hooks/useTextDirection";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,11 +20,15 @@ export const metadata = {
 
 export default function RootLayout({
   children,
+  params: { locale },
 }: {
   children: React.ReactNode;
+  params: { locale: string };
 }) {
+  const direction = useTextDirection(locale);
+
   return (
-    <html lang="en">
+    <html lang={locale} dir={direction}>
       <body className={`font-sans ${inter.variable}`}>
         <Header />
         <main>
