@@ -1,5 +1,27 @@
 {
-  "Index": {
-    "title": "Hello world!"
+  "index": {
+    "link": "Dashboard"
+  },
+  "dashboard": {
+    "head": {
+      "title": {
+        "default": "Dashboard",
+        "template": "%s | Dashboard"
+      },
+      "description": "React table with ssr"
+    },
+    "main": {
+      "header": "React table with ssr",
+      "sidebar": {
+        "dashboard": "Dashboard",
+        "table": {
+          "subheader": "Table",
+          "items": {
+            "with-modal": "With Modal",
+            "with-tab": "With Tab"
+          }
+        }
+      }
+    }
   }
 }

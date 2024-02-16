@@ -1,5 +1,27 @@
 {
-  "Index": {
-    "title": "سلام به همه"
+  "index": {
+    "link": "داشبورد"
+  },
+  "dashboard": {
+    "head": {
+      "title": {
+        "default": "داشبورد",
+        "template": "%s | داشبورد"
+      },
+      "description": "تست پیاده‌سازی جدول"
+    },
+    "main": {
+      "header": "تست پیاده‌سازی جدول",
+      "sidebar": {
+        "dashboard": "داشبورد",
+        "table": {
+          "subheader": "جدول",
+          "items": {
+            "with-modal": "به همراه مودال",
+            "with-tab": "به همراه تب"
+          }
+        }
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Container, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
 import { type ReactNode, useState } from "react";
 import { DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
@@ -8,7 +8,6 @@ import { api } from "~/trpc/react";
 import { columns } from "~/utils/columns";
 import { v4 as uuid } from "uuid";
 import CloseIcon from "@mui/icons-material/Close";
-import { Breadcrumbs } from "~/components/Breadcrumbs";
 
 type TabContext = {
   key: string;
@@ -72,8 +71,7 @@ export default function Home() {
   const { data } = getAllProductQuery;
 
   return (
-    <Container className="my-4">
-      <Breadcrumbs links={[{ title: "Home", href: "/" }]} current="With Tab" />
+    <>
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 4 }}>
         <Tabs
           value={selectedTab + 1}
@@ -165,6 +163,6 @@ export default function Home() {
           {tab.content}
         </Box>
       ))}
-    </Container>
+    </>
   );
 }

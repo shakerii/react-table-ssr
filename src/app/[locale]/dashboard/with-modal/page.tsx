@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Container,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -12,7 +11,6 @@ import {
 } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useState } from "react";
-import { Breadcrumbs } from "~/components/Breadcrumbs";
 import { DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { api } from "~/trpc/react";
@@ -64,11 +62,7 @@ export default function Home() {
   const { data } = getAllProductQuery;
 
   return (
-    <Container className="my-4">
-      <Breadcrumbs
-        links={[{ title: "Home", href: "/" }]}
-        current="With Modal"
-      />
+    <>
       <Dialog
         fullWidth={fullWidth}
         fullScreen={fullScreen}
@@ -124,6 +118,6 @@ export default function Home() {
           </Box>
         )}
       />
-    </Container>
+    </>
   );
 }

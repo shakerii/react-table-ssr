@@ -7,9 +7,7 @@ export default function Home() {
 
   return (
     <Container className="my-4">
-      <h1>{t("Index.title")}</h1>
-      <Link href="/with-modal">With Modal</Link>
-      <Link href="/with-tab">With Tab</Link>
+      <Link href="/dashboard">Dashboard</Link>
     </Container>
   );
 }
