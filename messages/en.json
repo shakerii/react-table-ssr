@@ -23,5 +23,21 @@
         }
       }
     }
+  },
+  "components": {
+    "data-table": {
+      "create-new": "Create New",
+      "export-to-csv": "Export to CSV",
+      "export-to-pdf": "Export to PDF",
+      "column-selector": "Column Selector",
+      "rows-per-page": "Rows per Page",
+      "display-rows": "{from} - {to} of {count, plural, =-1 {more than {to}} other {#}}"
+    }
+  },
+  "columns": {
+    "name": "Name",
+    "description": "Description",
+    "created-at": "Created At",
+    "updated-at": "Updated At"
   }
 }

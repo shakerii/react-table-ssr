@@ -23,5 +23,21 @@
         }
       }
     }
+  },
+  "components": {
+    "data-table": {
+      "create-new": "افزودن رکورد جدید",
+      "export-to-csv": "خروجی به اکسل",
+      "export-to-pdf": "خروجی به پی‌دی‌اف",
+      "column-selector": "انتخاب ستون‌ها",
+      "rows-per-page": "تعداد سطر در صفحه",
+      "display-rows": "{from, number} تا {to, number} از {count, plural, =-1 {بیشتر از {to}} other {#}}"
+    }
+  },
+  "columns": {
+    "name": "نام محصول",
+    "description": "توضیحات",
+    "created-at": "زمان تولید",
+    "updated-at": "زمان به‌روزرسانی"
   }
 }

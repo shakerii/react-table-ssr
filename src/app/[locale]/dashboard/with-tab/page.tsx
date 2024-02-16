@@ -1,13 +1,15 @@
 "use client";
 
 import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
-import { type ReactNode, useState } from "react";
-import { DataTable } from "~/components/DataTable";
+import { type ReactNode, useState, useMemo } from "react";
+import { type Columns, DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { api } from "~/trpc/react";
-import { columns } from "~/utils/columns";
 import { v4 as uuid } from "uuid";
 import CloseIcon from "@mui/icons-material/Close";
+import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
+import type { Product } from "@prisma/client";
+import { useTranslations } from "next-intl";
 
 type TabContext = {
   key: string;
@@ -16,6 +18,7 @@ type TabContext = {
 };
 
 export default function Home() {
+  const t = useTranslations();
   const getAllProductQuery = api.product.getAll.useQuery(undefined, {
     refetchInterval: false,
     refetchOnWindowFocus: false,
@@ -39,6 +42,49 @@ export default function Home() {
     },
   });
 
+  const columns = useMemo<Columns<Product>>(() => {
+    return [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: t("columns.name"),
+        cell: ({ cell }) => (
+          <span className="block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap">
+            {cell.getValue<string | undefined>()}
+          </span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "description",
+        accessorKey: "description",
+        header: t("columns.description"),
+        cell: ({ cell }) => (
+          <span className="block max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
+            {cell.getValue<string | undefined>()}
+          </span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "createdAt",
+        accessorKey: "createdAt",
+        header: t("columns.created-at"),
+        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
+        aggregatedCell: undefined,
+        filterFn: "auto",
+      },
+      {
+        id: "updatedAt",
+        accessorKey: "updatedAt",
+        header: t("columns.updated-at"),
+        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
+        aggregatedCell: undefined,
+        filterFn: "auto",
+      },
+    ];
+  }, []);
+
   const [selectedTab, setSelectedTab] = useState(-1);
   const [tabs, setTabs] = useState<TabContext[]>([]);
 
@@ -61,7 +107,7 @@ export default function Home() {
   };
 
   if (getAllProductQuery.status === "loading") {
-    return "Loading";
+    return <DataTableSkeleton />;
   }
 
   if (getAllProductQuery.status === "error") {
@@ -69,6 +115,21 @@ export default function Home() {
   }
 
   const { data } = getAllProductQuery;
+
+  const handleCreate = () => {
+    const tabIndex = openTab({
+      key: (uuid as () => string)(),
+      label: "Create New",
+      content: (
+        <ProductForm
+          onSubmit={async (values) => {
+            await createPropertyMutation.mutateAsync(values);
+            closeTab(tabIndex);
+          }}
+        />
+      ),
+    });
+  };
 
   return (
     <>
@@ -102,29 +163,13 @@ export default function Home() {
         <DataTable
           columns={columns}
           data={data}
-          GlobalActions={
-            <Button
-              onClick={() => {
-                const tabIndex = openTab({
-                  key: (uuid as () => string)(),
-                  label: "Create New",
-                  content: (
-                    <ProductForm
-                      onSubmit={async (values) => {
-                        await createPropertyMutation.mutateAsync(values);
-                        closeTab(tabIndex);
-                      }}
-                    />
-                  ),
-                });
-              }}
-            >
-              Create New
-            </Button>
-          }
+          exportToCSV
+          exportToPDF
+          onCreate={handleCreate}
           RowActions={({ row }) => (
             <Box display="flex">
               <Button
+                size="small"
                 onClick={() => {
                   const tabIndex = openTab({
                     key: (uuid as () => string)(),
@@ -147,6 +192,7 @@ export default function Home() {
                 Edit
               </Button>
               <Button
+                size="small"
                 onClick={() => deletePropertyMutation.mutate(row.original.id)}
               >
                 Delete

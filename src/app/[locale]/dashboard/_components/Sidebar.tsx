@@ -15,7 +15,7 @@ import BackupTableIcon from "@mui/icons-material/BackupTable";
 import HomeIcon from "@mui/icons-material/Home";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "~/utils/navigation";
-import { FC, useMemo } from "react";
+import { type FC, useMemo, Fragment } from "react";
 
 type SidebarListItem =
   | { text: string; href: string; icon: FC<SvgIconProps> }
@@ -29,7 +29,7 @@ const SidebarList = ({ list }: { list: SidebarListItem[] }) => {
       {list.map((item) => {
         if ("text" in item) {
           return (
-            <Link href={item.href}>
+            <Link key={item.text} href={item.href}>
               <ListItem disablePadding>
                 <ListItemButton selected={pathname === item.href}>
                   <ListItemIcon>
@@ -45,10 +45,10 @@ const SidebarList = ({ list }: { list: SidebarListItem[] }) => {
           );
         }
         return (
-          <>
+          <Fragment key={item.subheader}>
             <ListSubheader>{item.subheader}</ListSubheader>
             <SidebarList list={item.items} />
-          </>
+          </Fragment>
         );
       })}
     </List>

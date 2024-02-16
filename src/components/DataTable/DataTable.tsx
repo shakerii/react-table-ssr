@@ -5,7 +5,12 @@ import {
   Button,
   Checkbox,
   Grid,
+  IconButton,
+  ListItemText,
+  Menu,
+  MenuItem,
   Paper,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +18,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -21,6 +27,7 @@ import {
   type ColumnOrderState,
   type GroupingState,
   type RowSelectionState,
+  type VisibilityState,
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
@@ -48,20 +55,32 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import { useFormatter, useTranslations } from "next-intl";
 
 type Props<TData> = {
   data: TData[];
   columns: Columns<TData>;
-  GlobalActions?: ReactNode;
+  exportToPDF?: boolean;
+  exportToCSV?: boolean;
+  onCreate?: () => void;
+  // TODO remove
   RowActions?: FC<{ row: Row<TData> }>;
 };
 
 export const DataTable = <TData,>({
   data,
   columns,
-  GlobalActions,
+  exportToCSV,
+  exportToPDF,
+  onCreate,
   RowActions,
 }: Props<TData>) => {
+  const t = useTranslations("components.data-table");
+  const formatter = useFormatter();
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
   );
@@ -69,6 +88,9 @@ export const DataTable = <TData,>({
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
+    useState<HTMLElement>();
 
   const table = useReactTable({
     data,
@@ -79,6 +101,7 @@ export const DataTable = <TData,>({
       globalFilter,
       grouping,
       rowSelection,
+      columnVisibility,
     },
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -92,6 +115,7 @@ export const DataTable = <TData,>({
     onGlobalFilterChange: setGlobalFilter,
     onGroupingChange: setGrouping,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -107,154 +131,196 @@ export const DataTable = <TData,>({
     debugColumns: true,
   });
 
+  const handleExportToPDF = () => {
+    table.getIsSomeRowsSelected()
+      ? exportRowsToPDF({
+          filename: "Testing export to PDF",
+          rows: table.getSelectedRowModel().rows,
+          headers: table.getFlatHeaders(),
+        })
+      : exportRowsToPDF({
+          filename: "Testing export to PDF",
+          rows: table.getPrePaginationRowModel().rows,
+          headers: table.getFlatHeaders(),
+        });
+  };
+
+  const handleExportToCSV = () => {
+    table.getIsSomeRowsSelected()
+      ? exportRowsToCSV({
+          filename: "Testing export to CSV",
+          rows: table.getSelectedRowModel().rows,
+          headers: table.getFlatHeaders(),
+        })
+      : exportRowsToCSV({
+          filename: "Testing export to CSV",
+          rows: table.getPrePaginationRowModel().rows,
+          headers: table.getFlatHeaders(),
+        });
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <TableContainer component={Paper}>
-        <Box p={2} display="flex" alignItems="center">
-          <Box flex={1} display="flex" alignItems="center" gap={2}>
+        <Box p={2}>
+          <Box>
             <DebouncedInput
               size="small"
               value={globalFilter}
               placeholder="Filter All"
               onChange={(value) => setGlobalFilter(value as string)}
             />
-            <Box></Box>
-            {table.getIsSomeRowsSelected() ? (
-              <>
-                <Button
-                  onClick={() =>
-                    exportRowsToCSV({
-                      filename: "Testing export to CSV",
-                      rows: table.getSelectedRowModel().rows,
-                      headers: table.getFlatHeaders(),
-                    })
-                  }
-                >
-                  Export Selected to CSV
-                </Button>
-                <Button
-                  onClick={() =>
-                    exportRowsToPDF({
-                      filename: "Testing export to PDF",
-                      rows: table.getSelectedRowModel().rows,
-                      headers: table.getFlatHeaders(),
-                    })
-                  }
-                >
-                  Export Selected to PDF
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={() =>
-                    exportRowsToCSV({
-                      filename: "Testing export to CSV",
-                      rows: table.getPrePaginationRowModel().rows,
-                      headers: table.getFlatHeaders(),
-                    })
-                  }
-                >
-                  Export All to CSV
-                </Button>
-                <Button
-                  onClick={() =>
-                    exportRowsToPDF({
-                      filename: "Testing export to PDF",
-                      rows: table.getPrePaginationRowModel().rows,
-                      headers: table.getFlatHeaders(),
-                    })
-                  }
-                >
-                  Export All to PDF
-                </Button>
-              </>
+          </Box>
+          <Box mt={1} display="flex" rowGap={2}>
+            {onCreate && (
+              <Tooltip title={t("create-new")}>
+                <IconButton onClick={onCreate}>
+                  <AddCircleIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Tooltip title={t("column-selector")}>
+              <IconButton
+                onClick={(e) => setColumnSelectorAnchorEl(e.currentTarget)}
+              >
+                <ViewWeekIcon />
+              </IconButton>
+            </Tooltip>
+            {exportToPDF && (
+              <Tooltip title={t("export-to-pdf")}>
+                <IconButton onClick={handleExportToPDF}>
+                  <PictureAsPdfIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+            {exportToCSV && (
+              <Tooltip title={t("export-to-csv")}>
+                <IconButton onClick={handleExportToCSV}>
+                  <DescriptionIcon />
+                </IconButton>
+              </Tooltip>
             )}
           </Box>
-          <Box>{GlobalActions}</Box>
+          <Menu
+            anchorEl={columnSelectorAnchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+            open={Boolean(columnSelectorAnchorEl)}
+            onClose={() => setColumnSelectorAnchorEl(undefined)}
+          >
+            {table.getAllLeafColumns().map((column) => {
+              return (
+                <MenuItem
+                  key={column.id}
+                  onClick={column.getToggleVisibilityHandler()}
+                  sx={{ justifyContent: "space-between" }}
+                >
+                  <p>{String(column.columnDef.header)}</p>
+                  <Switch checked={column.getIsVisible()} />
+                </MenuItem>
+              );
+            })}
+          </Menu>
         </Box>
-        <Table className="mt-2">
-          <TableHead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={table.getIsAllRowsSelected()}
-                    indeterminate={table.getIsSomeRowsSelected()}
-                    onChange={table.getToggleAllRowsSelectedHandler()}
-                  />
-                </TableCell>
-                {headerGroup.headers.map((header) => (
-                  <HeaderCell key={header.id} header={header} table={table} />
-                ))}
-                {RowActions && <TableCell />}
-              </TableRow>
-            ))}
-          </TableHead>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>
-                  {row.getIsGrouped() ? (
+        <Box width="100%" overflow="auto">
+          <Table size="small">
+            <TableHead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  <TableCell>
                     <Checkbox
-                      checked={row.getIsAllSubRowsSelected()}
-                      disabled={!row.getCanSelectSubRows()}
-                      indeterminate={row.getIsSomeSelected()}
-                      onChange={row.getToggleSelectedHandler()}
+                      size="small"
+                      checked={table.getIsAllRowsSelected()}
+                      indeterminate={table.getIsSomeRowsSelected()}
+                      onChange={table.getToggleAllRowsSelectedHandler()}
                     />
-                  ) : (
-                    <Checkbox
-                      checked={row.getIsSelected()}
-                      disabled={!row.getCanSelect()}
-                      indeterminate={row.getIsSomeSelected()}
-                      onChange={row.getToggleSelectedHandler()}
-                    />
-                  )}
-                </TableCell>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    sx={{
-                      cursor: row.getCanExpand() ? "pointer" : "normal",
-                      backgroundColor: getTableCellBackgroundColor(cell),
-                    }}
-                    onClick={row.getToggleExpandedHandler()}
-                  >
-                    {cell.getIsGrouped() ? (
-                      <Grid container gap={1} flexWrap="nowrap">
-                        {row.getIsExpanded() ? (
-                          <ExpandMoreIcon />
-                        ) : (
-                          <ExpandLessIcon />
-                        )}
-                        <Typography variant="body1">
+                  </TableCell>
+                  {headerGroup.headers.map((header) => (
+                    <HeaderCell key={header.id} header={header} table={table} />
+                  ))}
+                  {RowActions && <TableCell />}
+                </TableRow>
+              ))}
+            </TableHead>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>
+                    {row.getIsGrouped() ? (
+                      <Checkbox
+                        checked={row.getIsAllSubRowsSelected()}
+                        disabled={!row.getCanSelectSubRows()}
+                        indeterminate={row.getIsSomeSelected()}
+                        onChange={row.getToggleSelectedHandler()}
+                      />
+                    ) : (
+                      <Checkbox
+                        checked={row.getIsSelected()}
+                        disabled={!row.getCanSelect()}
+                        indeterminate={row.getIsSomeSelected()}
+                        onChange={row.getToggleSelectedHandler()}
+                      />
+                    )}
+                  </TableCell>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      sx={{
+                        cursor: row.getCanExpand() ? "pointer" : "normal",
+                        backgroundColor: getTableCellBackgroundColor(cell),
+                      }}
+                      onClick={row.getToggleExpandedHandler()}
+                    >
+                      {cell.getIsGrouped() ? (
+                        <Grid container gap={1} flexWrap="nowrap">
+                          {row.getIsExpanded() ? (
+                            <ExpandMoreIcon />
+                          ) : (
+                            <ExpandLessIcon />
+                          )}
+                          <Typography variant="body1" textAlign="start">
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </Typography>
+                          <Typography variant="subtitle2" textAlign="start">
+                            ({row.subRows.length})
+                          </Typography>
+                        </Grid>
+                      ) : cell.getIsAggregated() ? (
+                        <Typography variant="body1" textAlign="start">
+                          {flexRender(
+                            cell.column.columnDef.aggregatedCell ??
+                              cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </Typography>
+                      ) : cell.getIsPlaceholder() ? null : (
+                        <Typography variant="body1" textAlign="start">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext(),
                           )}
                         </Typography>
-                        <Typography variant="subtitle2">
-                          ({row.subRows.length})
-                        </Typography>
-                      </Grid>
-                    ) : cell.getIsAggregated() ? (
-                      flexRender(
-                        cell.column.columnDef.aggregatedCell ??
-                          cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )
-                    ) : cell.getIsPlaceholder() ? null : (
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    )}
-                  </TableCell>
-                ))}
-                {RowActions && (
-                  <TableCell>{<RowActions row={row} />}</TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      )}
+                    </TableCell>
+                  ))}
+                  {RowActions && (
+                    <TableCell>{<RowActions row={row} />}</TableCell>
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 100]}
           component="div"
@@ -263,6 +329,10 @@ export const DataTable = <TData,>({
           page={table.getState().pagination.pageIndex}
           onPageChange={(_, page) => table.setPageIndex(page)}
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
+          labelRowsPerPage={t("rows-per-page")}
+          labelDisplayedRows={({ from, to, count }) =>
+            t("display-rows", { from, to, count })
+          }
         />
       </TableContainer>
     </DndProvider>

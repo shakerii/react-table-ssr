@@ -1,6 +1,6 @@
 import "~/styles/globals.css";
 
-import { Inter } from "next/font/google";
+import { Tajawal } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -8,8 +8,9 @@ import { useTextDirection } from "~/hooks/useTextDirection";
 import { getTranslations } from "next-intl/server";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 
-const inter = Inter({
-  subsets: ["latin"],
+const tajawal = Tajawal({
+  weight: ["200", "300", "400", "500", "700", "800", "900"],
+  subsets: ["arabic", "latin"],
   variable: "--font-sans",
 });
 
@@ -41,7 +42,7 @@ export default function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={`font-sans ${inter.variable}`}>
+      <body className={`font-sans ${tajawal.variable}`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </NextIntlClientProvider>

@@ -31,7 +31,7 @@ export default function RootLayout({
         <Box minWidth="250px" sx={{ display: { xs: "none", sm: "block" } }}>
           <Sidebar />
         </Box>
-        <Box flex={1} px={{ xs: 2, md: 4 }} overflow="scroll">
+        <Box flex={1} px={{ xs: 2, md: 4 }} overflow="hidden">
           {children}
         </Box>
       </Box>

@@ -103,7 +103,10 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
             : undefined
         }
       >
-        <Typography onClick={header.column.getToggleSortingHandler()}>
+        <Typography
+          onClick={header.column.getToggleSortingHandler()}
+          textAlign="start"
+        >
           {header.isPlaceholder ? null : (
             <>
               {flexRender(header.column.columnDef.header, header.getContext())}{" "}

@@ -1,0 +1,13 @@
+Dashboard:
+    ✔ Loading state (skeleton) @done (2/16/2024, 5:48:53 PM)
+    ☐ Change font
+    ☐ More coloring
+    ☐ Make tabs unique by product
+
+Data table:
+    ✔ Column selector @done (2/16/2024, 7:39:43 PM)
+    ☐ Hide some columns in mobile (two types of columns)
+    ✔ Right to left @done (2/16/2024, 5:48:47 PM)
+    ☐ Right click on rows
+    ☐ Telerik grid template (toolbar)
+    ☐ Server side grid

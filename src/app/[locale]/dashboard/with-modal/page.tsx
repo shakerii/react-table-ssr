@@ -10,13 +10,15 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import type { Product } from "@prisma/client";
-import { useState } from "react";
-import { DataTable } from "~/components/DataTable";
+import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
+import { type Columns, DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
+import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
 import { api } from "~/trpc/react";
-import { columns } from "~/utils/columns";
 
 export default function Home() {
+  const t = useTranslations();
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
   const open = product !== undefined;
   const [fullWidth, setFullWidth] = useState(false);
@@ -51,8 +53,51 @@ export default function Home() {
     },
   });
 
+  const columns = useMemo<Columns<Product>>(() => {
+    return [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: t("columns.name"),
+        cell: ({ cell }) => (
+          <span className="block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap">
+            {cell.getValue<string | undefined>()}
+          </span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "description",
+        accessorKey: "description",
+        header: t("columns.description"),
+        cell: ({ cell }) => (
+          <span className="block max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
+            {cell.getValue<string | undefined>()}
+          </span>
+        ),
+        filterFn: "includesString",
+      },
+      {
+        id: "createdAt",
+        accessorKey: "createdAt",
+        header: t("columns.created-at"),
+        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
+        aggregatedCell: undefined,
+        filterFn: "auto",
+      },
+      {
+        id: "updatedAt",
+        accessorKey: "updatedAt",
+        header: t("columns.updated-at"),
+        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
+        aggregatedCell: undefined,
+        filterFn: "auto",
+      },
+    ];
+  }, [t]);
+
   if (getAllProductQuery.status === "loading") {
-    return "Loading";
+    return <DataTableSkeleton />;
   }
 
   if (getAllProductQuery.status === "error") {
@@ -104,13 +149,16 @@ export default function Home() {
       <DataTable
         columns={columns}
         data={data}
-        GlobalActions={
-          <Button onClick={() => setProduct(null)}>Create New</Button>
-        }
+        onCreate={() => setProduct(null)}
+        exportToCSV
+        exportToPDF
         RowActions={({ row }) => (
           <Box display="flex">
-            <Button onClick={() => setProduct(row.original)}>Edit</Button>
+            <Button size="small" onClick={() => setProduct(row.original)}>
+              Edit
+            </Button>
             <Button
+              size="small"
               onClick={() => deletePropertyMutation.mutate(row.original.id)}
             >
               Delete
