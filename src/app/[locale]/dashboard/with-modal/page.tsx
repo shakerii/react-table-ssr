@@ -14,7 +14,11 @@ import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
-import { type Columns, DataTable } from "~/components/DataTable";
+import {
+  type Columns,
+  DataTable,
+  type RowAction,
+} from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
 import { api } from "~/trpc/react";
@@ -60,7 +64,7 @@ export default function Home() {
       {
         id: "name",
         accessorKey: "name",
-        header: t("columns.name"),
+        header: t("data.columns.name"),
         cell: ({ cell }) => (
           <span className="block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap">
             {cell.getValue<string | undefined>()}
@@ -71,7 +75,7 @@ export default function Home() {
       {
         id: "description",
         accessorKey: "description",
-        header: t("columns.description"),
+        header: t("data.columns.description"),
         cell: ({ cell }) => (
           <span className="block max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
             {cell.getValue<string | undefined>()}
@@ -82,7 +86,7 @@ export default function Home() {
       {
         id: "createdAt",
         accessorKey: "createdAt",
-        header: t("columns.created-at"),
+        header: t("data.columns.created-at"),
         cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
         aggregatedCell: undefined,
         filterFn: "auto",
@@ -90,13 +94,28 @@ export default function Home() {
       {
         id: "updatedAt",
         accessorKey: "updatedAt",
-        header: t("columns.updated-at"),
+        header: t("data.columns.updated-at"),
         cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
         aggregatedCell: undefined,
         filterFn: "auto",
       },
     ];
   }, [t]);
+
+  const rowActions = useMemo<RowAction<Product>[]>(() => {
+    return [
+      {
+        name: t("data.actions.edit"),
+        icon: <EditIcon />,
+        onClick: (row) => setProduct(row.original),
+      },
+      {
+        name: t("data.actions.delete"),
+        icon: <DeleteIcon />,
+        onClick: (row) => deletePropertyMutation.mutate(row.original.id),
+      },
+    ];
+  }, [t, deletePropertyMutation]);
 
   if (getAllProductQuery.status === "loading") {
     return <DataTableSkeleton />;
@@ -149,24 +168,13 @@ export default function Home() {
         </DialogContent>
       </Dialog>
       <DataTable
-        columns={columns}
         data={data}
+        columns={columns}
+        rowActions={rowActions}
         exportToCSV
         exportToPDF
         onCreate={() => setProduct(null)}
         onRefresh={() => getAllProductQuery.refetch()}
-        rowActions={[
-          {
-            name: "Edit",
-            icon: <EditIcon />,
-            onClick: (row) => setProduct(row.original),
-          },
-          {
-            name: "Delete",
-            icon: <DeleteIcon />,
-            onClick: (row) => deletePropertyMutation.mutate(row.original.id),
-          },
-        ]}
       />
     </>
   );

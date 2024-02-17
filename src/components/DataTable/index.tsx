@@ -1,2 +1,2 @@
 export { DataTable } from "./DataTable";
-export type { Columns } from "./types";
+export type { Columns, RowAction } from "./types";

@@ -35,10 +35,16 @@
       "display-rows": "{from} - {to} of {count, plural, =-1 {more than {to}} other {#}}"
     }
   },
-  "columns": {
-    "name": "Name",
-    "description": "Description",
-    "created-at": "Created At",
-    "updated-at": "Updated At"
+  "data": {
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "columns": {
+      "name": "Name",
+      "description": "Description",
+      "created-at": "Created At",
+      "updated-at": "Updated At"
+    }
   }
 }

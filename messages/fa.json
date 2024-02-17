@@ -35,10 +35,16 @@
       "display-rows": "{from, number} تا {to, number} از {count, plural, =-1 {بیشتر از {to}} other {#}}"
     }
   },
-  "columns": {
-    "name": "نام محصول",
-    "description": "توضیحات",
-    "created-at": "زمان تولید",
-    "updated-at": "زمان به‌روزرسانی"
+  "data": {
+    "actions": {
+      "edit": "ویرایش",
+      "delete": "حذف"
+    },
+    "columns": {
+      "name": "نام محصول",
+      "description": "توضیحات",
+      "created-at": "زمان تولید",
+      "updated-at": "زمان به‌روزرسانی"
+    }
   }
 }

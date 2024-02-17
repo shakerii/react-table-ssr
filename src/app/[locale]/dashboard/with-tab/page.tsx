@@ -6,10 +6,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { v4 as uuid } from "uuid";
 
-import { type Columns, DataTable } from "~/components/DataTable";
+import {
+  type Columns,
+  DataTable,
+  type RowAction,
+} from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
 import { api } from "~/trpc/react";
@@ -22,6 +26,31 @@ type TabContext = {
 
 export default function Home() {
   const t = useTranslations();
+
+  const [selectedTab, setSelectedTab] = useState(-1);
+  const [tabs, setTabs] = useState<TabContext[]>([]);
+
+  const openTab = useCallback(
+    (tab: TabContext) => {
+      setTabs((tabs) => [...tabs, tab]);
+      setSelectedTab(tabs.length);
+      return tabs.length;
+    },
+    [tabs.length],
+  );
+
+  const closeTab = (index: number) => {
+    if (index < 0) {
+      return;
+    }
+    setTabs((tabs) => {
+      setSelectedTab(-1);
+      const newTabs = [...tabs];
+      newTabs.splice(index, 1);
+      return newTabs;
+    });
+  };
+
   const getAllProductQuery = api.product.getAll.useQuery(undefined, {
     refetchInterval: false,
     refetchOnWindowFocus: false,
@@ -50,7 +79,7 @@ export default function Home() {
       {
         id: "name",
         accessorKey: "name",
-        header: t("columns.name"),
+        header: t("data.columns.name"),
         cell: ({ cell }) => (
           <span className="block max-w-72 overflow-hidden text-ellipsis whitespace-nowrap">
             {cell.getValue<string | undefined>()}
@@ -61,7 +90,7 @@ export default function Home() {
       {
         id: "description",
         accessorKey: "description",
-        header: t("columns.description"),
+        header: t("data.columns.description"),
         cell: ({ cell }) => (
           <span className="block max-w-96 overflow-hidden text-ellipsis whitespace-nowrap">
             {cell.getValue<string | undefined>()}
@@ -72,7 +101,7 @@ export default function Home() {
       {
         id: "createdAt",
         accessorKey: "createdAt",
-        header: t("columns.created-at"),
+        header: t("data.columns.created-at"),
         cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
         aggregatedCell: undefined,
         filterFn: "auto",
@@ -80,7 +109,7 @@ export default function Home() {
       {
         id: "updatedAt",
         accessorKey: "updatedAt",
-        header: t("columns.updated-at"),
+        header: t("data.columns.updated-at"),
         cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
         aggregatedCell: undefined,
         filterFn: "auto",
@@ -88,26 +117,37 @@ export default function Home() {
     ];
   }, [t]);
 
-  const [selectedTab, setSelectedTab] = useState(-1);
-  const [tabs, setTabs] = useState<TabContext[]>([]);
-
-  const openTab = (tab: TabContext) => {
-    setTabs((tabs) => [...tabs, tab]);
-    setSelectedTab(tabs.length);
-    return tabs.length;
-  };
-
-  const closeTab = (index: number) => {
-    if (index < 0) {
-      return;
-    }
-    setTabs((tabs) => {
-      setSelectedTab(-1);
-      const newTabs = [...tabs];
-      newTabs.splice(index, 1);
-      return newTabs;
-    });
-  };
+  const rowActions = useMemo<RowAction<Product>[]>(() => {
+    return [
+      {
+        name: t("data.actions.edit"),
+        icon: <EditIcon />,
+        onClick: (row) => {
+          const tabIndex = openTab({
+            key: (uuid as () => string)(),
+            label: `Update ${row.original.name}`,
+            content: (
+              <ProductForm
+                defaultValues={row.original}
+                onSubmit={async (values) => {
+                  await updatePropertyMutation.mutateAsync({
+                    id: row.original.id,
+                    ...values,
+                  });
+                  closeTab(tabIndex);
+                }}
+              />
+            ),
+          });
+        },
+      },
+      {
+        name: t("data.actions.delete"),
+        icon: <DeleteIcon />,
+        onClick: (row) => deletePropertyMutation.mutate(row.original.id),
+      },
+    ];
+  }, [t, openTab, deletePropertyMutation, updatePropertyMutation]);
 
   if (getAllProductQuery.status === "loading") {
     return <DataTableSkeleton />;
@@ -164,41 +204,13 @@ export default function Home() {
       </Box>
       <Box sx={{ display: selectedTab === -1 ? "block" : "none" }}>
         <DataTable
-          columns={columns}
           data={data}
+          columns={columns}
+          rowActions={rowActions}
           exportToCSV
           exportToPDF
           onCreate={handleCreate}
           onRefresh={() => getAllProductQuery.refetch()}
-          rowActions={[
-            {
-              name: "Edit",
-              icon: <EditIcon />,
-              onClick: (row) => {
-                const tabIndex = openTab({
-                  key: (uuid as () => string)(),
-                  label: `Update ${row.original.name}`,
-                  content: (
-                    <ProductForm
-                      defaultValues={row.original}
-                      onSubmit={async (values) => {
-                        await updatePropertyMutation.mutateAsync({
-                          id: row.original.id,
-                          ...values,
-                        });
-                        closeTab(tabIndex);
-                      }}
-                    />
-                  ),
-                });
-              },
-            },
-            {
-              name: "Delete",
-              icon: <DeleteIcon />,
-              onClick: (row) => deletePropertyMutation.mutate(row.original.id),
-            },
-          ]}
         />
       </Box>
       {tabs.map((tab, index) => (

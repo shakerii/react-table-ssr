@@ -49,7 +49,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { type ReactElement, useState } from "react";
+import { useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -57,7 +57,7 @@ import { useIsRTL } from "~/hooks/useIsRTL";
 
 import { DebouncedInput } from "../DebouncedInput";
 import { HeaderCell } from "./HeaderCell";
-import type { Columns } from "./types";
+import type { Columns, RowAction } from "./types";
 import {
   exportRowsToCSV,
   exportRowsToPDF,
@@ -65,12 +65,6 @@ import {
   fuzzySort,
   getTableCellBackgroundColor,
 } from "./utils";
-
-type RowAction<TData> = {
-  name: string;
-  icon?: ReactElement;
-  onClick: (row: Row<TData>) => void;
-};
 
 type Props<TData> = {
   data: TData[];
