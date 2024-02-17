@@ -26,6 +26,7 @@
   },
   "components": {
     "data-table": {
+      "refresh": "Refresh",
       "create-new": "Create New",
       "export-to-csv": "Export to CSV",
       "export-to-pdf": "Export to PDF",

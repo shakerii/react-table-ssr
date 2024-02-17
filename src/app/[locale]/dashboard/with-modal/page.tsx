@@ -1,8 +1,9 @@
 "use client";
 
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
-  Button,
   Checkbox,
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import {
 import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+
 import { type Columns, DataTable } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
@@ -149,22 +151,22 @@ export default function Home() {
       <DataTable
         columns={columns}
         data={data}
-        onCreate={() => setProduct(null)}
         exportToCSV
         exportToPDF
-        RowActions={({ row }) => (
-          <Box display="flex">
-            <Button size="small" onClick={() => setProduct(row.original)}>
-              Edit
-            </Button>
-            <Button
-              size="small"
-              onClick={() => deletePropertyMutation.mutate(row.original.id)}
-            >
-              Delete
-            </Button>
-          </Box>
-        )}
+        onCreate={() => setProduct(null)}
+        onRefresh={() => getAllProductQuery.refetch()}
+        rowActions={[
+          {
+            name: "Edit",
+            icon: <EditIcon />,
+            onClick: (row) => setProduct(row.original),
+          },
+          {
+            name: "Delete",
+            icon: <DeleteIcon />,
+            onClick: (row) => deletePropertyMutation.mutate(row.original.id),
+          },
+        ]}
       />
     </>
   );

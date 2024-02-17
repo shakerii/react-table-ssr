@@ -1,6 +1,7 @@
 import type { Column, FilterFnOption } from "@tanstack/react-table";
-import { TextFilterInput } from "./TextFilterInput";
+
 import { RangeFilterInput } from "./RangeFilterInput";
+import { TextFilterInput } from "./TextFilterInput";
 
 type Props<TData> = {
   type: FilterFnOption<TData> | undefined;

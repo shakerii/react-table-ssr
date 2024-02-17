@@ -1,15 +1,23 @@
 "use client";
 
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import {
   Box,
-  Button,
   Checkbox,
   Grid,
   IconButton,
-  ListItemText,
+  ListItemIcon,
   Menu,
   MenuItem,
+  MenuList,
   Paper,
+  Popover,
   Switch,
   Table,
   TableBody,
@@ -22,10 +30,10 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  type Row,
   type ColumnFiltersState,
   type ColumnOrderState,
   type GroupingState,
+  type Row,
   type RowSelectionState,
   type VisibilityState,
   flexRender,
@@ -40,9 +48,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { type ReactNode, useState, type FC } from "react";
-import type { Columns } from "./types";
+import { useTranslations } from "next-intl";
+import { type ReactElement, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+
+import { useIsRTL } from "~/hooks/useIsRTL";
+
+import { DebouncedInput } from "../DebouncedInput";
 import { HeaderCell } from "./HeaderCell";
+import type { Columns } from "./types";
 import {
   exportRowsToCSV,
   exportRowsToPDF,
@@ -50,16 +65,12 @@ import {
   fuzzySort,
   getTableCellBackgroundColor,
 } from "./utils";
-import { DebouncedInput } from "../DebouncedInput";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import DescriptionIcon from "@mui/icons-material/Description";
-import ViewWeekIcon from "@mui/icons-material/ViewWeek";
-import { useFormatter, useTranslations } from "next-intl";
+
+type RowAction<TData> = {
+  name: string;
+  icon?: ReactElement;
+  onClick: (row: Row<TData>) => void;
+};
 
 type Props<TData> = {
   data: TData[];
@@ -67,8 +78,8 @@ type Props<TData> = {
   exportToPDF?: boolean;
   exportToCSV?: boolean;
   onCreate?: () => void;
-  // TODO remove
-  RowActions?: FC<{ row: Row<TData> }>;
+  onRefresh?: () => void;
+  rowActions: RowAction<TData>[];
 };
 
 export const DataTable = <TData,>({
@@ -76,11 +87,12 @@ export const DataTable = <TData,>({
   columns,
   exportToCSV,
   exportToPDF,
+  rowActions,
   onCreate,
-  RowActions,
+  onRefresh,
 }: Props<TData>) => {
   const t = useTranslations("components.data-table");
-  const formatter = useFormatter();
+  const isRTL = useIsRTL();
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
   );
@@ -91,6 +103,11 @@ export const DataTable = <TData,>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<HTMLElement>();
+
+  const [openRowActions, setOpenRowActions] = useState<{
+    position: { top: number; left: number };
+    row: Row<TData>;
+  }>();
 
   const table = useReactTable({
     data,
@@ -200,6 +217,13 @@ export const DataTable = <TData,>({
                 </IconButton>
               </Tooltip>
             )}
+            {onRefresh && (
+              <Tooltip title={t("refresh")}>
+                <IconButton onClick={onRefresh}>
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
           <Menu
             anchorEl={columnSelectorAnchorEl}
@@ -245,13 +269,21 @@ export const DataTable = <TData,>({
                   {headerGroup.headers.map((header) => (
                     <HeaderCell key={header.id} header={header} table={table} />
                   ))}
-                  {RowActions && <TableCell />}
                 </TableRow>
               ))}
             </TableHead>
             <TableBody>
               {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setOpenRowActions({
+                      row,
+                      position: { left: e.clientX, top: e.clientY },
+                    });
+                  }}
+                >
                   <TableCell>
                     {row.getIsGrouped() ? (
                       <Checkbox
@@ -313,11 +345,48 @@ export const DataTable = <TData,>({
                       )}
                     </TableCell>
                   ))}
-                  {RowActions && (
-                    <TableCell>{<RowActions row={row} />}</TableCell>
-                  )}
                 </TableRow>
               ))}
+              <Popover
+                anchorReference="anchorPosition"
+                anchorPosition={openRowActions?.position}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: isRTL ? "right" : "left",
+                }}
+                open={Boolean(openRowActions)}
+                onClose={() => setOpenRowActions(undefined)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setOpenRowActions(undefined);
+                }}
+              >
+                <MenuList>
+                  {rowActions.map((action) => {
+                    return (
+                      <MenuItem
+                        key={action.name}
+                        onClick={() => {
+                          if (!openRowActions) return;
+                          action.onClick(openRowActions.row);
+                          setOpenRowActions(undefined);
+                        }}
+                      >
+                        {action.icon && (
+                          <ListItemIcon>{action.icon}</ListItemIcon>
+                        )}
+                        <Typography variant="inherit" noWrap>
+                          {action.name}
+                        </Typography>
+                      </MenuItem>
+                    );
+                  })}
+                </MenuList>
+              </Popover>
             </TableBody>
           </Table>
         </Box>

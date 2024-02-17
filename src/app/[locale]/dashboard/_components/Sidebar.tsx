@@ -1,21 +1,22 @@
 "use client";
 
+import BackupTableIcon from "@mui/icons-material/BackupTable";
+import HomeIcon from "@mui/icons-material/Home";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import {
   Box,
-  SvgIconProps,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader,
+  SvgIconProps,
 } from "@mui/material";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import BackupTableIcon from "@mui/icons-material/BackupTable";
-import HomeIcon from "@mui/icons-material/Home";
 import { useTranslations } from "next-intl";
+import { type FC, Fragment, useMemo } from "react";
+
 import { Link, usePathname } from "~/utils/navigation";
-import { type FC, useMemo, Fragment } from "react";
 
 type SidebarListItem =
   | { text: string; href: string; icon: FC<SvgIconProps> }

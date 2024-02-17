@@ -1,7 +1,8 @@
-import { Header } from "./_components/Header";
-import { getTranslations } from "next-intl/server";
-import { Sidebar } from "./_components/Sidebar";
 import { Box } from "@mui/material";
+import { getTranslations } from "next-intl/server";
+
+import { Header } from "./_components/Header";
+import { Sidebar } from "./_components/Sidebar";
 
 export const generateMetadata = async ({
   params: { locale },
@@ -25,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Box height="100vh" display="flex" flexDirection="column">
+    <Box height="100svh" display="flex" flexDirection="column">
       <Header />
       <Box component="main" height="100%" display="flex" mt={1}>
         <Box minWidth="250px" sx={{ display: { xs: "none", sm: "block" } }}>

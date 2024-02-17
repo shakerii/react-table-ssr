@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Box,
@@ -12,16 +13,17 @@ import {
   Typography,
 } from "@mui/material";
 import { useLocale, useTranslations } from "next-intl";
-import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import { Sidebar } from "./Sidebar";
+import { useState } from "react";
+
+import { useIsRTL } from "~/hooks/useIsRTL";
 import {
   localeNames,
   locales,
   usePathname,
   useRouter,
 } from "~/utils/navigation";
-import { useIsRTL } from "~/hooks/useIsRTL";
+
+import { Sidebar } from "./Sidebar";
 
 export const Header = () => {
   const t = useTranslations("dashboard.main");

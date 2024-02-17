@@ -1,7 +1,8 @@
-import type { Column } from "@tanstack/react-table";
-import { DebouncedInput } from "../DebouncedInput";
 import { Grid } from "@mui/material";
+import type { Column } from "@tanstack/react-table";
 import { useCallback } from "react";
+
+import { DebouncedInput } from "../DebouncedInput";
 
 type MinMax = [number | undefined, number | undefined];
 

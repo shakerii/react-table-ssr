@@ -6,9 +6,9 @@ import {
   type Row,
   sortingFns,
 } from "@tanstack/react-table";
+import { download, generateCsv, mkConfig } from "export-to-csv";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { mkConfig, generateCsv, download } from "export-to-csv";
 
 export const fuzzyFilter = <TData>(
   row: Row<TData>,

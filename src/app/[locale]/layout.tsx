@@ -1,12 +1,10 @@
-import "~/styles/globals.css";
-
+import { NextIntlClientProvider, useMessages } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Tajawal } from "next/font/google";
 
-import { TRPCReactProvider } from "~/trpc/react";
-
 import { useTextDirection } from "~/hooks/useTextDirection";
-import { getTranslations } from "next-intl/server";
-import { NextIntlClientProvider, useMessages } from "next-intl";
+import "~/styles/globals.css";
+import { TRPCReactProvider } from "~/trpc/react";
 
 const tajawal = Tajawal({
   weight: ["200", "300", "400", "500", "700", "800", "900"],

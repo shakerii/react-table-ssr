@@ -1,12 +1,17 @@
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import FeaturedPlayListIcon from "@mui/icons-material/FeaturedPlayList";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import {
+  Box,
   Grid,
-  Menu,
-  MenuItem,
   IconButton,
-  TableCell,
   ListItemIcon,
   ListItemText,
-  Box,
+  Menu,
+  MenuItem,
+  TableCell,
   Typography,
 } from "@mui/material";
 import {
@@ -16,14 +21,10 @@ import {
   type Table,
   flexRender,
 } from "@tanstack/react-table";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import SwapVertIcon from "@mui/icons-material/SwapVert";
-import FeaturedPlayListIcon from "@mui/icons-material/FeaturedPlayList";
-import { useDrag, useDrop } from "react-dnd";
-import { Filter } from "./Filter";
 import { useState } from "react";
+import { useDrag, useDrop } from "react-dnd";
+
+import { Filter } from "./Filter";
 
 type Props<TData> = {
   header: Header<TData, unknown>;

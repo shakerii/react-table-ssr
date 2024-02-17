@@ -1,15 +1,18 @@
 "use client";
 
-import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
-import { type ReactNode, useState, useMemo } from "react";
-import { type Columns, DataTable } from "~/components/DataTable";
-import { ProductForm } from "~/components/forms/ProductForm";
-import { api } from "~/trpc/react";
-import { v4 as uuid } from "uuid";
 import CloseIcon from "@mui/icons-material/Close";
-import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
+import { type ReactNode, useMemo, useState } from "react";
+import { v4 as uuid } from "uuid";
+
+import { type Columns, DataTable } from "~/components/DataTable";
+import { ProductForm } from "~/components/forms/ProductForm";
+import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
+import { api } from "~/trpc/react";
 
 type TabContext = {
   key: string;
@@ -166,39 +169,36 @@ export default function Home() {
           exportToCSV
           exportToPDF
           onCreate={handleCreate}
-          RowActions={({ row }) => (
-            <Box display="flex">
-              <Button
-                size="small"
-                onClick={() => {
-                  const tabIndex = openTab({
-                    key: (uuid as () => string)(),
-                    label: `Update ${row.original.name}`,
-                    content: (
-                      <ProductForm
-                        defaultValues={row.original}
-                        onSubmit={async (values) => {
-                          await updatePropertyMutation.mutateAsync({
-                            id: row.original.id,
-                            ...values,
-                          });
-                          closeTab(tabIndex);
-                        }}
-                      />
-                    ),
-                  });
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                size="small"
-                onClick={() => deletePropertyMutation.mutate(row.original.id)}
-              >
-                Delete
-              </Button>
-            </Box>
-          )}
+          onRefresh={() => getAllProductQuery.refetch()}
+          rowActions={[
+            {
+              name: "Edit",
+              icon: <EditIcon />,
+              onClick: (row) => {
+                const tabIndex = openTab({
+                  key: (uuid as () => string)(),
+                  label: `Update ${row.original.name}`,
+                  content: (
+                    <ProductForm
+                      defaultValues={row.original}
+                      onSubmit={async (values) => {
+                        await updatePropertyMutation.mutateAsync({
+                          id: row.original.id,
+                          ...values,
+                        });
+                        closeTab(tabIndex);
+                      }}
+                    />
+                  ),
+                });
+              },
+            },
+            {
+              name: "Delete",
+              icon: <DeleteIcon />,
+              onClick: (row) => deletePropertyMutation.mutate(row.original.id),
+            },
+          ]}
         />
       </Box>
       {tabs.map((tab, index) => (

@@ -8,6 +8,6 @@ Data table:
     ✔ Column selector @done (2/16/2024, 7:39:43 PM)
     ☐ Hide some columns in mobile (two types of columns)
     ✔ Right to left @done (2/16/2024, 5:48:47 PM)
-    ☐ Right click on rows
+    ✔ Right click on rows @done (2/17/2024, 3:00:35 PM)
     ☐ Telerik grid template (toolbar)
     ☐ Server side grid

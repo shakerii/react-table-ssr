@@ -26,6 +26,7 @@
   },
   "components": {
     "data-table": {
+      "refresh": "تازه‌سازی",
       "create-new": "افزودن رکورد جدید",
       "export-to-csv": "خروجی به اکسل",
       "export-to-pdf": "خروجی به پی‌دی‌اف",
