@@ -3,7 +3,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useMemo, useState } from "react";
@@ -86,7 +86,7 @@ export default function Home() {
         filterFn: "auto",
       },
     ];
-  }, []);
+  }, [t]);
 
   const [selectedTab, setSelectedTab] = useState(-1);
   const [tabs, setTabs] = useState<TabContext[]>([]);

@@ -1,5 +1,14 @@
 {
   "cSpell.words": ["hookform", "jspdf", "Swipeable", "tanstack", "TRPC"],
+  "cSpell.ignorePaths": [
+    "package-lock.json",
+    "node_modules",
+    "vscode-extension",
+    ".git/objects",
+    ".vscode",
+    ".vscode-insiders",
+    "./messages/fa.json"
+  ],
   "typescript.tsdk": "node_modules\\typescript\\lib",
   "i18n-ally.localesPaths": ["messages"],
   "i18n-ally.keystyle": "nested"
