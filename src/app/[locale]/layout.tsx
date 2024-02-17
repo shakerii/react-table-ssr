@@ -1,16 +1,12 @@
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
+import { ThemeProvider } from "@mui/material/styles";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { Tajawal } from "next/font/google";
 
 import { useTextDirection } from "~/hooks/useTextDirection";
 import "~/styles/globals.css";
 import { TRPCReactProvider } from "~/trpc/react";
-
-const tajawal = Tajawal({
-  weight: ["200", "300", "400", "500", "700", "800", "900"],
-  subsets: ["arabic", "latin"],
-  variable: "--font-sans",
-});
+import { ltrTheme, rtlTheme } from "~/utils/theme";
 
 export const generateMetadata = async ({
   params: { locale },
@@ -19,10 +15,7 @@ export const generateMetadata = async ({
 }) => {
   const t = await getTranslations({ locale });
   return {
-    title: {
-      default: t("dashboard.head.title.default"),
-      template: t("dashboard.head.title.template"),
-    },
+    title: { default: t("dashboard.head.title.default") },
     description: t("dashboard.head.description"),
     icons: [{ rel: "icon", url: "/favicon.ico" }],
   };
@@ -40,9 +33,15 @@ export default function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={`font-sans ${tajawal.variable}`}>
+      <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <AppRouterCacheProvider>
+              <ThemeProvider theme={direction === "rtl" ? rtlTheme : ltrTheme}>
+                {children}
+              </ThemeProvider>
+            </AppRouterCacheProvider>
+          </TRPCReactProvider>
         </NextIntlClientProvider>
       </body>
     </html>

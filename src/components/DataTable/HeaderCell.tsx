@@ -21,6 +21,7 @@ import {
   type Table,
   flexRender,
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 
@@ -44,7 +45,14 @@ const reorderColumn = (
   return [...columnOrder];
 };
 
+const sortIcons = {
+  asc: <ArrowDownwardIcon fontSize="small" />,
+  desc: <ArrowUpwardIcon fontSize="small" />,
+  false: <SwapVertIcon fontSize="small" />,
+};
+
 export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
+  const t = useTranslations("components.data-table.header.actions");
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -60,9 +68,9 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
   const { columnOrder, grouping } = getState();
   const { column } = header;
 
-  const [, dropRef] = useDrop({
+  const [, dropRef] = useDrop<Column<TData>>({
     accept: "column",
-    drop: (draggedColumn: Column<TData>) => {
+    drop: (draggedColumn) => {
       const isGrouped = draggedColumn.getIsGrouped();
       if (isGrouped) {
         const newGrouping = reorderColumn(
@@ -90,6 +98,39 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
     type: "column",
   });
 
+  const isGrouped = header.column.getIsGrouped();
+  const sorted = header.column.getIsSorted();
+
+  const actions = [
+    {
+      title: t("sort.asc"),
+      icon: <ArrowDownwardIcon />,
+      selected: sorted === "asc",
+      disabled: false,
+      onClick: () =>
+        sorted === "asc"
+          ? header.column.clearSorting()
+          : header.column.toggleSorting(false, false),
+    },
+    {
+      title: t("sort.desc"),
+      icon: <ArrowUpwardIcon />,
+      selected: sorted === "desc",
+      disabled: false,
+      onClick: () =>
+        sorted === "desc"
+          ? header.column.clearSorting()
+          : header.column.toggleSorting(true, false),
+    },
+    {
+      title: isGrouped ? t("ungroup") : t("group"),
+      icon: <FeaturedPlayListIcon />,
+      selected: false,
+      disabled: false,
+      onClick: header.column.getToggleGroupingHandler(),
+    },
+  ];
+
   return (
     <TableCell
       ref={dropRef}
@@ -105,17 +146,14 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
         }
       >
         <Typography
+          noWrap
           onClick={header.column.getToggleSortingHandler()}
           textAlign="start"
         >
           {header.isPlaceholder ? null : (
             <>
               {flexRender(header.column.columnDef.header, header.getContext())}{" "}
-              {{
-                asc: <ArrowDownwardIcon fontSize="small" />,
-                desc: <ArrowUpwardIcon fontSize="small" />,
-                false: <SwapVertIcon fontSize="small" />,
-              }[header.column.getIsSorted() as string] ?? null}
+              {sortIcons[sorted as keyof typeof sortIcons] ?? null}
             </>
           )}
         </Typography>
@@ -142,30 +180,19 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
               onClose={handleClose}
               onClick={handleClose}
             >
-              <MenuItem
-                selected={header.column.getIsSorted() === "asc"}
-                onClick={() => header.column.toggleSorting(false, false)}
-              >
-                <ListItemIcon>
-                  <ArrowDownwardIcon />
-                </ListItemIcon>
-                <ListItemText>Sort Ascending</ListItemText>
-              </MenuItem>
-              <MenuItem
-                selected={header.column.getIsSorted() === "desc"}
-                onClick={() => header.column.toggleSorting(true, false)}
-              >
-                <ListItemIcon>
-                  <ArrowUpwardIcon />
-                </ListItemIcon>
-                <ListItemText>Sort Descending</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={header.column.getToggleGroupingHandler()}>
-                <ListItemIcon>
-                  <FeaturedPlayListIcon />
-                </ListItemIcon>
-                <ListItemText>Toggle Group</ListItemText>
-              </MenuItem>
+              {actions.map((action) => {
+                return (
+                  <MenuItem
+                    key={action.title}
+                    selected={action.selected}
+                    disabled={action.disabled}
+                    onClick={action.onClick}
+                  >
+                    <ListItemIcon>{action.icon}</ListItemIcon>
+                    <ListItemText>{action.title}</ListItemText>
+                  </MenuItem>
+                );
+              })}
             </Menu>
           </Grid>
         </Grid>

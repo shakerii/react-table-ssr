@@ -28,11 +28,17 @@ export default function RootLayout({
   return (
     <Box height="100svh" display="flex" flexDirection="column">
       <Header />
-      <Box component="main" height="100%" display="flex" mt={1}>
+      <Box
+        component="main"
+        height="100%"
+        display="flex"
+        mt={1}
+        overflow="hidden"
+      >
         <Box minWidth="250px" sx={{ display: { xs: "none", sm: "block" } }}>
           <Sidebar />
         </Box>
-        <Box flex={1} px={{ xs: 2, md: 4 }} overflow="hidden">
+        <Box flex={1} px={{ xs: 2, md: 4 }} overflow="auto">
           {children}
         </Box>
       </Box>

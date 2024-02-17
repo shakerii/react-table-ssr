@@ -10,15 +10,7 @@ import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import {
   Box,
   Checkbox,
-  Grid,
-  IconButton,
-  ListItemIcon,
-  Menu,
-  MenuItem,
-  MenuList,
   Paper,
-  Popover,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -26,7 +18,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -49,21 +40,19 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { useIsRTL } from "~/hooks/useIsRTL";
-
-import { DebouncedInput } from "../DebouncedInput";
 import { HeaderCell } from "./HeaderCell";
+import { RowActionsPopover } from "./RowActionsPopover";
+import { TableActions } from "./TableActions";
 import type { Columns, RowAction } from "./types";
 import {
   exportRowsToCSV,
   exportRowsToPDF,
   fuzzyFilter,
   fuzzySort,
-  getTableCellBackgroundColor,
 } from "./utils";
 
 type Props<TData> = {
@@ -88,7 +77,6 @@ export const DataTable = <TData,>({
   onRefresh,
 }: Props<TData>) => {
   const t = useTranslations("components.data-table");
-  const isRTL = useIsRTL();
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
   );
@@ -100,7 +88,7 @@ export const DataTable = <TData,>({
     defaultVisibilityState ?? {},
   );
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
-    useState<HTMLElement>();
+    useState<Element>();
 
   const [openRowActions, setOpenRowActions] = useState<{
     position: { top: number; left: number };
@@ -174,234 +162,221 @@ export const DataTable = <TData,>({
         });
   };
 
+  const globalActions = [
+    {
+      title: t("create-new"),
+      icon: <AddCircleIcon />,
+      visible: !!onCreate,
+      onClick: onCreate,
+    },
+    {
+      title: t("column-selector"),
+      icon: <ViewWeekIcon />,
+      visible: true,
+      onClick: (e: MouseEvent) => setColumnSelectorAnchorEl(e.currentTarget),
+    },
+    {
+      title: t("export-to-pdf"),
+      icon: <PictureAsPdfIcon />,
+      visible: exportToPDF,
+      onClick: handleExportToPDF,
+    },
+    {
+      title: t("export-to-csv"),
+      icon: <DescriptionIcon />,
+      visible: exportToCSV,
+      onClick: handleExportToCSV,
+    },
+    {
+      title: t("refresh"),
+      icon: <RefreshIcon />,
+      visible: !!onRefresh,
+      onClick: onRefresh,
+    },
+  ];
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <TableContainer component={Paper}>
-        <Box p={2}>
+      <Paper sx={{ width: "100%", overflow: "hidden" }}>
+        <TableContainer>
+          <TableActions
+            table={table}
+            actions={globalActions}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            columnSelectorAnchorEl={columnSelectorAnchorEl}
+            setColumnSelectorAnchorEl={setColumnSelectorAnchorEl}
+          />
           <Box>
-            <DebouncedInput
-              size="small"
-              value={globalFilter}
-              placeholder="Filter All"
-              onChange={(value) => setGlobalFilter(value as string)}
-            />
-          </Box>
-          <Box mt={1} display="flex" rowGap={2}>
-            {onCreate && (
-              <Tooltip title={t("create-new")}>
-                <IconButton onClick={onCreate}>
-                  <AddCircleIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-            <Tooltip title={t("column-selector")}>
-              <IconButton
-                onClick={(e) => setColumnSelectorAnchorEl(e.currentTarget)}
-              >
-                <ViewWeekIcon />
-              </IconButton>
-            </Tooltip>
-            {exportToPDF && (
-              <Tooltip title={t("export-to-pdf")}>
-                <IconButton onClick={handleExportToPDF}>
-                  <PictureAsPdfIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-            {exportToCSV && (
-              <Tooltip title={t("export-to-csv")}>
-                <IconButton onClick={handleExportToCSV}>
-                  <DescriptionIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-            {onRefresh && (
-              <Tooltip title={t("refresh")}>
-                <IconButton onClick={onRefresh}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-          <Menu
-            anchorEl={columnSelectorAnchorEl}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "center",
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "center",
-            }}
-            open={Boolean(columnSelectorAnchorEl)}
-            onClose={() => setColumnSelectorAnchorEl(undefined)}
-          >
-            {table.getAllLeafColumns().map((column) => {
-              return (
-                <MenuItem
-                  key={column.id}
-                  onClick={column.getToggleVisibilityHandler()}
-                  sx={{ justifyContent: "space-between" }}
-                >
-                  <p>{String(column.columnDef.header)}</p>
-                  <Switch checked={column.getIsVisible()} />
-                </MenuItem>
-              );
-            })}
-          </Menu>
-        </Box>
-        <Box width="100%" overflow="auto">
-          <Table size="small">
-            <TableHead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  <TableCell>
-                    <Checkbox
-                      size="small"
-                      checked={table.getIsAllRowsSelected()}
-                      indeterminate={table.getIsSomeRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
-                    />
-                  </TableCell>
-                  {headerGroup.headers.map((header) => (
-                    <HeaderCell key={header.id} header={header} table={table} />
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
-            <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    setOpenRowActions({
-                      row,
-                      position: { left: e.clientX, top: e.clientY },
-                    });
-                  }}
-                >
-                  <TableCell>
-                    {row.getIsGrouped() ? (
+            <Table stickyHeader size="small">
+              <TableHead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    <TableCell>
                       <Checkbox
-                        checked={row.getIsAllSubRowsSelected()}
-                        disabled={!row.getCanSelectSubRows()}
-                        indeterminate={row.getIsSomeSelected()}
-                        onChange={row.getToggleSelectedHandler()}
+                        size="small"
+                        checked={table.getIsAllRowsSelected()}
+                        indeterminate={table.getIsSomeRowsSelected()}
+                        onChange={table.getToggleAllRowsSelectedHandler()}
                       />
-                    ) : (
-                      <Checkbox
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        indeterminate={row.getIsSomeSelected()}
-                        onChange={row.getToggleSelectedHandler()}
-                      />
-                    )}
-                  </TableCell>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      sx={{
-                        cursor: row.getCanExpand() ? "pointer" : "normal",
-                        backgroundColor: getTableCellBackgroundColor(cell),
-                      }}
-                      onClick={row.getToggleExpandedHandler()}
-                    >
-                      {cell.getIsGrouped() ? (
-                        <Grid container gap={1} flexWrap="nowrap">
-                          {row.getIsExpanded() ? (
-                            <ExpandMoreIcon />
-                          ) : (
-                            <ExpandLessIcon />
-                          )}
-                          <Typography variant="body1" textAlign="start">
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </Typography>
-                          <Typography variant="subtitle2" textAlign="start">
-                            ({row.subRows.length})
-                          </Typography>
-                        </Grid>
-                      ) : cell.getIsAggregated() ? (
-                        <Typography variant="body1" textAlign="start">
-                          {flexRender(
-                            cell.column.columnDef.aggregatedCell ??
-                              cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </Typography>
-                      ) : cell.getIsPlaceholder() ? null : (
-                        <Typography variant="body1" textAlign="start">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </Typography>
-                      )}
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-              <Popover
-                anchorReference="anchorPosition"
-                anchorPosition={openRowActions?.position}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: isRTL ? "right" : "left",
-                }}
-                open={Boolean(openRowActions)}
-                onClose={() => setOpenRowActions(undefined)}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  setOpenRowActions(undefined);
-                }}
-              >
-                <MenuList>
-                  {rowActions.map((action) => {
+                    {grouping.map((group) => (
+                      <TableCell key={group}></TableCell>
+                    ))}
+                    {headerGroup.headers.map((header) => (
+                      <HeaderCell
+                        key={header.id}
+                        header={header}
+                        table={table}
+                      />
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHead>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => {
+                  if (row.getIsGrouped()) {
+                    const canExpand = row.getCanExpand();
                     return (
-                      <MenuItem
-                        key={action.name}
-                        onClick={() => {
-                          if (!openRowActions) return;
-                          action.onClick(openRowActions.row);
-                          setOpenRowActions(undefined);
-                        }}
-                      >
-                        {action.icon && (
-                          <ListItemIcon>{action.icon}</ListItemIcon>
-                        )}
-                        <Typography variant="inherit" noWrap>
-                          {action.name}
-                        </Typography>
-                      </MenuItem>
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => {
+                          if (cell.getIsGrouped()) {
+                            return (
+                              <>
+                                <TableCell
+                                  sx={{
+                                    bgcolor: "gray",
+                                    cursor: canExpand ? "pointer" : "normal",
+                                  }}
+                                  onClick={row.getToggleExpandedHandler()}
+                                >
+                                  {row.getIsExpanded() ? (
+                                    <ExpandMoreIcon />
+                                  ) : (
+                                    <ExpandLessIcon />
+                                  )}
+                                </TableCell>
+                                <TableCell
+                                  key={cell.id}
+                                  sx={{
+                                    bgcolor: "gray",
+                                    cursor: canExpand ? "pointer" : "normal",
+                                  }}
+                                  onClick={row.getToggleExpandedHandler()}
+                                  colSpan={grouping.length + 1}
+                                >
+                                  <Typography variant="body1" textAlign="start">
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </Typography>
+                                </TableCell>
+                              </>
+                            );
+                          }
+
+                          return (
+                            <TableCell
+                              key={cell.id}
+                              sx={{
+                                bgcolor: "gray",
+                                cursor: canExpand ? "pointer" : "normal",
+                              }}
+                              onClick={row.getToggleExpandedHandler()}
+                            >
+                              {cell.getIsAggregated() ? (
+                                <Typography variant="body1" textAlign="start">
+                                  {flexRender(
+                                    cell.column.columnDef.aggregatedCell ??
+                                      cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </Typography>
+                              ) : cell.getIsPlaceholder() ? null : (
+                                <Typography variant="body1" textAlign="start">
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </Typography>
+                              )}
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
                     );
-                  })}
-                </MenuList>
-              </Popover>
-            </TableBody>
-          </Table>
-        </Box>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 100]}
-          component="div"
-          count={table.getPrePaginationRowModel().rows.length}
-          rowsPerPage={table.getState().pagination.pageSize}
-          page={table.getState().pagination.pageIndex}
-          onPageChange={(_, page) => table.setPageIndex(page)}
-          onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
-          labelRowsPerPage={t("rows-per-page")}
-          labelDisplayedRows={({ from, to, count }) =>
-            t("display-rows", { from, to, count })
-          }
-        />
-      </TableContainer>
+                  }
+
+                  return (
+                    <TableRow
+                      key={row.id}
+                      hover
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        setOpenRowActions({
+                          row,
+                          position: { left: e.clientX, top: e.clientY },
+                        });
+                      }}
+                    >
+                      {grouping.map((group) => (
+                        <TableCell
+                          key={group}
+                          sx={{ bgcolor: "gray" }}
+                        ></TableCell>
+                      ))}
+                      <TableCell>
+                        <Checkbox
+                          size="small"
+                          sx={{ p: 0 }}
+                          checked={row.getIsSelected()}
+                          disabled={!row.getCanSelect()}
+                          indeterminate={row.getIsSomeSelected()}
+                          onChange={row.getToggleSelectedHandler()}
+                        />
+                      </TableCell>
+                      {row.getVisibleCells().map((cell) => {
+                        return (
+                          <TableCell key={cell.id}>
+                            <Typography variant="body1" textAlign="start">
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Typography>
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+                <RowActionsPopover
+                  position={openRowActions?.position}
+                  row={openRowActions?.row}
+                  actions={rowActions}
+                  onClose={() => setOpenRowActions(undefined)}
+                />
+              </TableBody>
+            </Table>
+          </Box>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 100]}
+            component="div"
+            count={data.length}
+            rowsPerPage={table.getState().pagination.pageSize}
+            page={table.getState().pagination.pageIndex}
+            onPageChange={(_, page) => table.setPageIndex(page)}
+            onRowsPerPageChange={(e) =>
+              table.setPageSize(Number(e.target.value))
+            }
+            labelRowsPerPage={t("rows-per-page")}
+            labelDisplayedRows={({ from, to, count }) =>
+              t("display-rows", { from, to, count })
+            }
+          />
+        </TableContainer>
+      </Paper>
     </DndProvider>
   );
 };

@@ -13,7 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import type { Product } from "@prisma/client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
 import {
@@ -25,9 +25,15 @@ import {
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
 import { api } from "~/trpc/react";
+import { localeCodes } from "~/utils/navigation";
 
 export default function Home() {
   const t = useTranslations();
+  const locale = useLocale();
+  const localeCode =
+    locale in localeCodes
+      ? localeCodes[locale as keyof typeof localeCodes]
+      : "en-US";
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
@@ -90,22 +96,20 @@ export default function Home() {
       },
       {
         id: "createdAt",
-        accessorKey: "createdAt",
+        accessorFn: (row) => row.createdAt.toLocaleDateString(localeCode),
         header: t("data.columns.created-at"),
-        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
-        aggregatedCell: undefined,
+        aggregatedCell: () => undefined,
         filterFn: "auto",
       },
       {
         id: "updatedAt",
-        accessorKey: "updatedAt",
+        accessorFn: (row) => row.updatedAt.toLocaleDateString(localeCode),
         header: t("data.columns.updated-at"),
-        cell: ({ cell }) => cell.getValue<Date | undefined>()?.toDateString(),
-        aggregatedCell: undefined,
+        aggregatedCell: () => undefined,
         filterFn: "auto",
       },
     ];
-  }, [t]);
+  }, [t, localeCode]);
 
   const defaultVisibilityState = useMemo<VisibilityState | undefined>(() => {
     if (isSmUp) {

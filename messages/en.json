@@ -32,7 +32,18 @@
       "export-to-pdf": "Export to PDF",
       "column-selector": "Column Selector",
       "rows-per-page": "Rows per Page",
-      "display-rows": "{from} - {to} of {count, plural, =-1 {more than {to}} other {#}}"
+      "display-rows": "{from} - {to} of {count, plural, =-1 {more than {to}} other {#}}",
+      "header": {
+        "actions": {
+          "sort": {
+            "asc": "Sort Ascending",
+            "desc": "Sort Descending"
+          },
+          "group": "Group Column",
+          "ungroup": "Ungroup Column",
+          "drag-to-group": "Drag column here to add it to grouping"
+        }
+      }
     }
   },
   "data": {

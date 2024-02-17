@@ -32,7 +32,18 @@
       "export-to-pdf": "خروجی به پی‌دی‌اف",
       "column-selector": "انتخاب ستون‌ها",
       "rows-per-page": "تعداد سطر در صفحه",
-      "display-rows": "{from, number} تا {to, number} از {count, plural, =-1 {بیشتر از {to}} other {#}}"
+      "display-rows": "{from, number} تا {to, number} از {count, plural, =-1 {بیشتر از {to}} other {#}}",
+      "header": {
+        "actions": {
+          "sort": {
+            "asc": "مرتب‌سازی از بالا",
+            "desc": "مرتب‌سازی از پایین"
+          },
+          "group": "افزودن به گروه‌بندی",
+          "ungroup": "حذف از گروه‌بندی",
+          "drag-to-group": "ستون را به اینجا کشیده تا به گروه‌بندی اضافه شود"
+        }
+      }
     }
   },
   "data": {

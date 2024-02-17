@@ -6,7 +6,7 @@ export const productRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.product.findMany({
       orderBy: { createdAt: "desc" },
-      take: 1_000,
+      take: 10_000,
     });
   }),
 
