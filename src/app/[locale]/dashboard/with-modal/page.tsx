@@ -9,6 +9,8 @@ import {
   DialogContent,
   DialogTitle,
   FormControlLabel,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useTranslations } from "next-intl";
@@ -18,6 +20,7 @@ import {
   type Columns,
   DataTable,
   type RowAction,
+  type VisibilityState,
 } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
@@ -25,6 +28,8 @@ import { api } from "~/trpc/react";
 
 export default function Home() {
   const t = useTranslations();
+  const theme = useTheme();
+  const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
   const open = product !== undefined;
   const [fullWidth, setFullWidth] = useState(false);
@@ -102,6 +107,16 @@ export default function Home() {
     ];
   }, [t]);
 
+  const defaultVisibilityState = useMemo<VisibilityState | undefined>(() => {
+    if (isSmUp) {
+      return undefined;
+    }
+    return {
+      description: false,
+      updatedAt: false,
+    };
+  }, [isSmUp]);
+
   const rowActions = useMemo<RowAction<Product>[]>(() => {
     return [
       {
@@ -171,6 +186,7 @@ export default function Home() {
         data={data}
         columns={columns}
         rowActions={rowActions}
+        defaultVisibilityState={defaultVisibilityState}
         exportToCSV
         exportToPDF
         onCreate={() => setProduct(null)}

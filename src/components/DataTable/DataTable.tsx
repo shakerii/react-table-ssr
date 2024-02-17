@@ -69,6 +69,7 @@ import {
 type Props<TData> = {
   data: TData[];
   columns: Columns<TData>;
+  defaultVisibilityState?: VisibilityState;
   exportToPDF?: boolean;
   exportToCSV?: boolean;
   onCreate?: () => void;
@@ -79,6 +80,7 @@ type Props<TData> = {
 export const DataTable = <TData,>({
   data,
   columns,
+  defaultVisibilityState,
   exportToCSV,
   exportToPDF,
   rowActions,
@@ -94,7 +96,9 @@ export const DataTable = <TData,>({
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    defaultVisibilityState ?? {},
+  );
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<HTMLElement>();
 
