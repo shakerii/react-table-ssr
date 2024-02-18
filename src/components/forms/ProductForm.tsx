@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, FormGroup, TextField } from "@mui/material";
+import { useTranslations } from "next-intl";
 import { type DefaultValues, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export const ProductForm = ({ defaultValues, onSubmit }: Props) => {
+  const t = useTranslations("components.forms.product");
   const {
     register,
     handleSubmit,
@@ -35,7 +37,7 @@ export const ProductForm = ({ defaultValues, onSubmit }: Props) => {
     >
       <FormGroup>
         <TextField
-          label="Name"
+          label={t("name")}
           error={!!errors.name}
           helperText={errors.name?.message}
           {...register("name")}
@@ -43,7 +45,7 @@ export const ProductForm = ({ defaultValues, onSubmit }: Props) => {
       </FormGroup>
       <FormGroup>
         <TextField
-          label="Description"
+          label={t("description")}
           error={!!errors.description}
           helperText={errors.description?.message}
           {...register("description")}
@@ -56,7 +58,7 @@ export const ProductForm = ({ defaultValues, onSubmit }: Props) => {
           color="primary"
           type="submit"
         >
-          Save
+          {t("save")}
         </Button>
       </FormGroup>
     </Box>

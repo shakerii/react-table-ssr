@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useLocale, useTranslations } from "next-intl";
-import { type ReactElement, useMemo } from "react";
+import { useMemo } from "react";
 
 import {
   type Columns,
@@ -27,14 +27,6 @@ import { useTabs } from "~/hooks/useTabs";
 import { api } from "~/trpc/react";
 import { localeCodes } from "~/utils/navigation";
 
-type TKey = "products" | "new" | number;
-
-type Tab = {
-  key: TKey;
-  label: string;
-  content: ReactElement | undefined;
-};
-
 export default function Home() {
   const t = useTranslations();
   const locale = useLocale();
@@ -45,7 +37,7 @@ export default function Home() {
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const { tabs, currentTabIndex, setCurrentTabIndex, openTab, closeTab } =
-    useTabs<TKey, Tab>({
+    useTabs<"products" | number | "new">({
       defaultTabs: [
         {
           key: "products",

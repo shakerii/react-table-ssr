@@ -24,6 +24,11 @@
       }
     }
   },
+  "with-tab": {
+    "products": "محصولات",
+    "update-product": "به‌روزرسانی {name}",
+    "create": "افزودن"
+  },
   "components": {
     "data-table": {
       "refresh": "تازه‌سازی",
@@ -43,6 +48,13 @@
           "ungroup": "حذف از گروه‌بندی",
           "drag-to-group": "ستون را به اینجا کشیده تا به گروه‌بندی اضافه شود"
         }
+      }
+    },
+    "forms": {
+      "product": {
+        "name": "نام محصول",
+        "description": "توضیحات محصول",
+        "save": "ذخیره"
       }
     }
   },

@@ -24,6 +24,11 @@
       }
     }
   },
+  "with-tab": {
+    "products": "Products",
+    "update-product": "Update {name}",
+    "create": "Create New"
+  },
   "components": {
     "data-table": {
       "refresh": "Refresh",
@@ -43,6 +48,13 @@
           "ungroup": "Ungroup Column",
           "drag-to-group": "Drag column here to add it to grouping"
         }
+      }
+    },
+    "forms": {
+      "product": {
+        "name": "Name",
+        "description": "Description",
+        "save": "Save"
       }
     }
   },

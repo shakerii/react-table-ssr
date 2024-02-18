@@ -40,7 +40,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { type MouseEvent, useState } from "react";
+import { type MouseEvent, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -94,6 +94,10 @@ export const DataTable = <TData,>({
     position: { top: number; left: number };
     row: Row<TData>;
   }>();
+
+  useEffect(() => {
+    setRowSelection({});
+  }, [data]);
 
   const table = useReactTable({
     data,
