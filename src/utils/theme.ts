@@ -43,6 +43,15 @@ export const rtlTheme = createTheme({
         },
       },
     },
+    MuiDrawer: {
+      styleOverrides: {
+        paperAnchorRight: ({ ownerState }) => ({
+          transform: ownerState.open
+            ? "none !important"
+            : "translateX(100%) !important",
+        }),
+      },
+    },
     MuiChip: {
       styleOverrides: {
         deleteIcon: {

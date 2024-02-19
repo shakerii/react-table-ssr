@@ -117,6 +117,7 @@ export const DataTable = <TData,>({
       fuzzy: fuzzySort,
     },
     enableRowSelection: true,
+    paginateExpandedRows: false,
     onColumnOrderChange: setColumnOrder,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
@@ -249,7 +250,7 @@ export const DataTable = <TData,>({
                               <>
                                 <TableCell
                                   sx={{
-                                    bgcolor: "gray",
+                                    backgroundColor: "lightgray",
                                     cursor: canExpand ? "pointer" : "normal",
                                   }}
                                   onClick={row.getToggleExpandedHandler()}
@@ -263,7 +264,7 @@ export const DataTable = <TData,>({
                                 <TableCell
                                   key={cell.id}
                                   sx={{
-                                    bgcolor: "gray",
+                                    backgroundColor: "lightgray",
                                     cursor: canExpand ? "pointer" : "normal",
                                   }}
                                   onClick={row.getToggleExpandedHandler()}
@@ -284,7 +285,7 @@ export const DataTable = <TData,>({
                             <TableCell
                               key={cell.id}
                               sx={{
-                                bgcolor: "gray",
+                                backgroundColor: "lightgray",
                                 cursor: canExpand ? "pointer" : "normal",
                               }}
                               onClick={row.getToggleExpandedHandler()}
@@ -327,7 +328,7 @@ export const DataTable = <TData,>({
                       {grouping.map((group) => (
                         <TableCell
                           key={group}
-                          sx={{ bgcolor: "gray" }}
+                          sx={{ backgroundColor: "lightgray" }}
                         ></TableCell>
                       ))}
                       <TableCell>
@@ -367,7 +368,7 @@ export const DataTable = <TData,>({
           <TablePagination
             rowsPerPageOptions={[5, 10, 25, 100]}
             component="div"
-            count={data.length}
+            count={table.getGroupedRowModel().rows.length}
             rowsPerPage={table.getState().pagination.pageSize}
             page={table.getState().pagination.pageIndex}
             onPageChange={(_, page) => table.setPageIndex(page)}

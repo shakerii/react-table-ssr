@@ -11,7 +11,7 @@ import {
   ListItemIcon,
   ListItemText,
   ListSubheader,
-  SvgIconProps,
+  type SvgIconProps,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { type FC, Fragment, useMemo } from "react";
@@ -82,7 +82,7 @@ export const Sidebar = () => {
         ],
       },
     ] satisfies SidebarListItem[];
-  }, []);
+  }, [t]);
 
   return (
     <Box role="presentation" minWidth="max-content" height="100%">

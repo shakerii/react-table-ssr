@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { getTranslations } from "next-intl/server";
 
 import { Header } from "./_components/Header";
@@ -35,9 +35,16 @@ export default function RootLayout({
         mt={1}
         overflow="hidden"
       >
-        <Box minWidth="250px" sx={{ display: { xs: "none", sm: "block" } }}>
+        <Paper
+          elevation={2}
+          sx={{
+            minWidth: "250px",
+            borderRadius: 0,
+            display: { xs: "none", sm: "block" },
+          }}
+        >
           <Sidebar />
-        </Box>
+        </Paper>
         <Box flex={1} px={{ xs: 2, md: 4 }} overflow="auto">
           {children}
         </Box>
