@@ -106,16 +106,20 @@ export default function Home() {
       },
       {
         id: "createdAt",
-        accessorFn: (row) => row.createdAt.toLocaleDateString(localeCode),
+        accessorKey: "createdAt",
         header: t("data.columns.created-at"),
+        cell: ({ cell }) =>
+          cell.getValue<Date | undefined>()?.toLocaleDateString(localeCode),
         aggregatedCell: () => undefined,
         enableColumnFilter: false,
         filterFn: "inNumberRange",
       },
       {
         id: "updatedAt",
-        accessorFn: (row) => row.updatedAt.toLocaleDateString(localeCode),
+        accessorKey: "updatedAt",
         header: t("data.columns.updated-at"),
+        cell: ({ cell }) =>
+          cell.getValue<Date | undefined>()?.toLocaleDateString(localeCode),
         aggregatedCell: () => undefined,
         enableColumnFilter: false,
         filterFn: "inNumberRange",

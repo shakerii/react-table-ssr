@@ -10,7 +10,8 @@ type Props<TData> = {
   column: Column<TData, unknown>;
 };
 
-export const RangeFilterInput = <TData,>({ column }: Props<TData>) => {
+// TODO fix this
+export const DateFilterInput = <TData,>({ column }: Props<TData>) => {
   const columnFilterValue = column.getFilterValue();
   const minmaxValue = column.getFacetedMinMaxValues();
 
@@ -39,7 +40,7 @@ export const RangeFilterInput = <TData,>({ column }: Props<TData>) => {
     >
       <Grid item>
         <DebouncedInput
-          type="number"
+          type="date"
           size="small"
           fullWidth
           sx={{ minWidth: 75 }}
@@ -50,7 +51,7 @@ export const RangeFilterInput = <TData,>({ column }: Props<TData>) => {
       </Grid>
       <Grid item>
         <DebouncedInput
-          type="number"
+          type="date"
           size="small"
           fullWidth
           sx={{ minWidth: 75 }}
