@@ -145,7 +145,7 @@ export default function Home() {
         onClick: (row) => {
           openTab({
             key: row.original.id,
-            label: t("with-tab.update-product", row.original),
+            label: t("with-tab.update", row.original),
             content: (
               <ProductForm
                 defaultValues={row.original}

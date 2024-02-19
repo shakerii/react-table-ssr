@@ -216,7 +216,7 @@ export const DataTable = <TData,>({
           sx={{
             maxHeight: 440,
             border: 1,
-            borderColor: "lightgray",
+            borderColor: (theme) => theme.palette.grey[300],
             scrollBehavior: "unset",
           }}
         >
@@ -254,7 +254,8 @@ export const DataTable = <TData,>({
                             <>
                               <TableCell
                                 sx={{
-                                  backgroundColor: "lightgray",
+                                  backgroundColor: (theme) =>
+                                    theme.palette.grey[300],
                                   cursor: canExpand ? "pointer" : "normal",
                                 }}
                                 onClick={row.getToggleExpandedHandler()}
@@ -268,7 +269,8 @@ export const DataTable = <TData,>({
                               <TableCell
                                 key={cell.id}
                                 sx={{
-                                  backgroundColor: "lightgray",
+                                  backgroundColor: (theme) =>
+                                    theme.palette.grey[300],
                                   cursor: canExpand ? "pointer" : "normal",
                                 }}
                                 onClick={row.getToggleExpandedHandler()}
@@ -289,7 +291,8 @@ export const DataTable = <TData,>({
                           <TableCell
                             key={cell.id}
                             sx={{
-                              backgroundColor: "lightgray",
+                              backgroundColor: (theme) =>
+                                theme.palette.grey[300],
                               cursor: canExpand ? "pointer" : "normal",
                             }}
                             onClick={row.getToggleExpandedHandler()}
@@ -332,7 +335,9 @@ export const DataTable = <TData,>({
                     {grouping.map((group) => (
                       <TableCell
                         key={group}
-                        sx={{ backgroundColor: "lightgray" }}
+                        sx={{
+                          backgroundColor: (theme) => theme.palette.grey[300],
+                        }}
                       ></TableCell>
                     ))}
                     <TableCell>

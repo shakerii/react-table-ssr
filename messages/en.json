@@ -24,9 +24,13 @@
       }
     }
   },
+  "with-modal": {
+    "update": "Update {name}",
+    "create": "Create New"
+  },
   "with-tab": {
     "products": "Products",
-    "update-product": "Update {name}",
+    "update": "Update {name}",
     "create": "Create New"
   },
   "components": {

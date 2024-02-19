@@ -1,14 +1,14 @@
 "use client";
 
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
-  Checkbox,
   Dialog,
   DialogContent,
   DialogTitle,
-  FormControlLabel,
+  IconButton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -24,11 +24,13 @@ import {
 } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
+import { useIsRTL } from "~/hooks/useIsRTL";
 import { api } from "~/trpc/react";
 import { localeCodes } from "~/utils/navigation";
 
 export default function Home() {
   const t = useTranslations();
+  const isRTL = useIsRTL();
   const locale = useLocale();
   const localeCode =
     locale in localeCodes
@@ -38,8 +40,6 @@ export default function Home() {
   const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const [product, setProduct] = useState<Product | undefined | null>(undefined);
   const open = product !== undefined;
-  const [fullWidth, setFullWidth] = useState(false);
-  const [fullScreen, setFullScreen] = useState(false);
 
   const getAllProductQuery = api.product.getAll.useQuery(undefined, {
     refetchInterval: false,
@@ -155,41 +155,35 @@ export default function Home() {
   return (
     <>
       <Dialog
-        fullWidth={fullWidth}
-        fullScreen={fullScreen}
+        fullWidth
+        fullScreen={!isSmUp}
         onClose={() => setProduct(undefined)}
         open={open}
       >
-        <DialogTitle>Create New Product</DialogTitle>
+        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+          {product ? t("with-tab.update", product) : t("with-tab.create")}
+        </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={() => setProduct(undefined)}
+          sx={{
+            position: "absolute",
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+            [isRTL ? "left" : "right"]: 8,
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <DialogContent>
-          <FormControlLabel
-            label="Full Width"
-            control={
-              <Checkbox
-                value={fullWidth}
-                onChange={(_, checked) => setFullWidth(checked)}
-              />
-            }
+          <ProductForm
+            defaultValues={product ? product : undefined}
+            onSubmit={(values) => {
+              product
+                ? updatePropertyMutation.mutate({ id: product.id, ...values })
+                : createPropertyMutation.mutate(values);
+            }}
           />
-          <FormControlLabel
-            label="Full Screen"
-            control={
-              <Checkbox
-                value={fullScreen}
-                onChange={(_, checked) => setFullScreen(checked)}
-              />
-            }
-          />
-          <Box pt={2}>
-            <ProductForm
-              defaultValues={product ? product : undefined}
-              onSubmit={(values) => {
-                product
-                  ? updatePropertyMutation.mutate({ id: product.id, ...values })
-                  : createPropertyMutation.mutate(values);
-              }}
-            />
-          </Box>
         </DialogContent>
       </Dialog>
       <DataTable
