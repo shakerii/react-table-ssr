@@ -59,42 +59,44 @@ export const TableActions = <TData,>({
     .filter((header) => header.column.getIsGrouped());
 
   return (
-    <Box p={2}>
-      <Box>
+    <Box py={2}>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
         <DebouncedInput
           size="small"
           value={globalFilter}
           placeholder="Filter All"
           onChange={(value) => setGlobalFilter(value as string)}
         />
-      </Box>
-      <Box mt={1} display="flex" rowGap={2}>
-        {actions.map((action) => {
-          if (!action.visible) return null;
-          return (
-            <Tooltip key={action.title} title={action.title}>
-              <IconButton onClick={action.onClick}>{action.icon}</IconButton>
-            </Tooltip>
-          );
-        })}
-        <ColumnSelectorMenu
-          anchorEl={columnSelectorAnchorEl}
-          onClose={() => setColumnSelectorAnchorEl(undefined)}
-          table={table}
-        />
-      </Box>
-      <Stack mt={1} direction="row" spacing={1} ref={dropRef}>
-        {groupedHeaders.length === 0 && (
-          <Typography>{t("drag-to-group")}</Typography>
-        )}
-        {groupedHeaders.map((header) => (
-          <Chip
-            key={header.id}
-            label={String(header.column.columnDef.header)}
-            onDelete={() => header.column.toggleGrouping()}
+        <Box display="flex" rowGap={2}>
+          {actions.map((action) => {
+            if (!action.visible) return null;
+            return (
+              <Tooltip key={action.title} title={action.title}>
+                <IconButton onClick={action.onClick}>{action.icon}</IconButton>
+              </Tooltip>
+            );
+          })}
+          <ColumnSelectorMenu
+            table={table}
+            anchorEl={columnSelectorAnchorEl}
+            onClose={() => setColumnSelectorAnchorEl(undefined)}
           />
-        ))}
-      </Stack>
+        </Box>
+      </Box>
+      <Box mt={2} p={1} border="1px dashed" borderRadius={2}>
+        <Stack direction="row" spacing={1} ref={dropRef}>
+          {groupedHeaders.length === 0 && (
+            <Typography>{t("drag-to-group")}</Typography>
+          )}
+          {groupedHeaders.map((header) => (
+            <Chip
+              key={header.id}
+              label={String(header.column.columnDef.header)}
+              onDelete={() => header.column.toggleGrouping()}
+            />
+          ))}
+        </Stack>
+      </Box>
     </Box>
   );
 };
