@@ -348,7 +348,7 @@ export const DataTable = <TData,>({
                     {row.getVisibleCells().map((cell) => {
                       return (
                         <TableCell size="small" key={cell.id}>
-                          <Typography>
+                          <Typography textAlign="start">
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),
