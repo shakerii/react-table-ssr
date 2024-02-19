@@ -26,15 +26,14 @@ export const fuzzySort = <TData>(
   rowB: Row<TData>,
   columnId: string,
 ) => {
-  let dir = 0;
-
-  if (rowA.columnFiltersMeta[columnId]) {
-    dir = compareItems(
-      rowA.columnFiltersMeta[columnId]!.itemRank,
-      rowB.columnFiltersMeta[columnId]!.itemRank,
-    );
+  if (!rowA.columnFiltersMeta[columnId]) {
+    return 0;
   }
 
+  const dir = compareItems(
+    rowA.columnFiltersMeta[columnId]!.itemRank,
+    rowB.columnFiltersMeta[columnId]!.itemRank,
+  );
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 

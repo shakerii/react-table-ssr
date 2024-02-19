@@ -5,11 +5,14 @@ import type { ReactElement } from "react";
 declare module "@tanstack/table-core" {
   interface FilterFns {
     fuzzy: FilterFn<unknown>;
+    custom: FilterFn<unknown>;
   }
   interface FilterMeta {
     itemRank: RankingInfo;
   }
 }
+
+export type CustomFilterOption = "contains" | "not-contains" | "equals";
 
 export type Columns<TData> = ColumnDef<TData>[];
 

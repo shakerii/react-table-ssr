@@ -47,6 +47,11 @@
           "group": "Group Column",
           "ungroup": "Ungroup Column",
           "drag-to-group": "Drag column here to add it to grouping"
+        },
+        "filters": {
+          "contains": "Contains",
+          "not-contains": "Not Contains",
+          "equals": "Equals"
         }
       }
     },

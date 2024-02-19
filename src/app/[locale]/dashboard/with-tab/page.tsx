@@ -91,7 +91,7 @@ export default function Home() {
             {cell.getValue<string | undefined>()}
           </span>
         ),
-        filterFn: "includesString",
+        filterFn: "custom",
       },
       {
         id: "description",
@@ -102,21 +102,23 @@ export default function Home() {
             {cell.getValue<string | undefined>()}
           </span>
         ),
-        filterFn: "includesString",
+        filterFn: "custom",
       },
       {
         id: "createdAt",
         accessorFn: (row) => row.createdAt.toLocaleDateString(localeCode),
         header: t("data.columns.created-at"),
         aggregatedCell: () => undefined,
-        filterFn: "auto",
+        enableColumnFilter: false,
+        filterFn: "inNumberRange",
       },
       {
         id: "updatedAt",
         accessorFn: (row) => row.updatedAt.toLocaleDateString(localeCode),
         header: t("data.columns.updated-at"),
         aggregatedCell: () => undefined,
-        filterFn: "auto",
+        enableColumnFilter: false,
+        filterFn: "inNumberRange",
       },
     ];
   }, [t, localeCode]);

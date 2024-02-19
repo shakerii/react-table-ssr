@@ -1,11 +1,10 @@
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import FeaturedPlayListIcon from "@mui/icons-material/FeaturedPlayList";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import {
   Box,
-  Grid,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -53,15 +52,18 @@ const sortIcons = {
 
 export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
   const t = useTranslations("components.data-table.header.actions");
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const [optionsAnchorEl, setOptionsAnchorEl] = useState<HTMLElement | null>(
+    null,
+  );
+  const optionsOpen = Boolean(optionsAnchorEl);
+
+  const handleClickOptions = (event: React.MouseEvent<HTMLElement>) => {
+    setOptionsAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleCloseOptions = () => {
+    setOptionsAnchorEl(null);
   };
 
   const { getState, setColumnOrder, setGrouping } = table;
@@ -157,28 +159,26 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
             </>
           )}
         </Typography>
-        <Grid mt={1} container flexWrap="nowrap">
-          <Grid item flexGrow={1}>
-            {header.column.getCanFilter() && (
-              <Filter
-                type={header.column.columnDef.filterFn}
-                column={header.column}
-              />
-            )}
-          </Grid>
-          <Grid item>
+        <Box mt={1} display="flex" flexWrap="nowrap">
+          <Box flexGrow={1}>
+            <Filter
+              type={header.column.columnDef.filterFn}
+              column={header.column}
+            />
+          </Box>
+          <Box>
             <IconButton
               ref={dragRef}
-              onClick={handleClick}
+              onClick={handleClickOptions}
               sx={{ cursor: isDragging ? "grabbing" : "grab" }}
             >
-              <FilterAltIcon />
+              <MoreVertIcon />
             </IconButton>
             <Menu
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleClose}
-              onClick={handleClose}
+              anchorEl={optionsAnchorEl}
+              open={optionsOpen}
+              onClose={handleCloseOptions}
+              onClick={handleCloseOptions}
             >
               {actions.map((action) => {
                 return (
@@ -194,8 +194,8 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
                 );
               })}
             </Menu>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
     </TableCell>
   );

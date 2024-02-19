@@ -47,6 +47,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import { HeaderCell } from "./HeaderCell";
 import { RowActionsPopover } from "./RowActionsPopover";
 import { TableActions } from "./TableActions";
+import { customFilter } from "./TextFilterInput";
 import type { Columns, RowAction } from "./types";
 import {
   exportRowsToCSV,
@@ -112,6 +113,7 @@ export const DataTable = <TData,>({
     },
     filterFns: {
       fuzzy: fuzzyFilter,
+      custom: customFilter,
     },
     sortingFns: {
       fuzzy: fuzzySort,
