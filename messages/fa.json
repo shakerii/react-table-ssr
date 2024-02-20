@@ -44,6 +44,7 @@
       "display-rows": "{from, number} تا {to, number} از {count, plural, =-1 {بیشتر از {to}} other {#}}",
       "header": {
         "actions": {
+          "filter-all": "فیلتر همه",
           "sort": {
             "asc": "مرتب‌سازی از بالا",
             "desc": "مرتب‌سازی از پایین"
@@ -53,6 +54,7 @@
           "drag-to-group": "ستون را به اینجا کشیده تا به گروه‌بندی اضافه شود"
         },
         "filters": {
+          "search": "جست‌وجو",
           "contains": "شامل باشد",
           "not-contains": "شامل نباشد",
           "equals": "مساوی باشد"

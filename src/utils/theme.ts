@@ -1,12 +1,11 @@
 "use client";
 
 import { createTheme } from "@mui/material/styles";
-import { Amiri, Roboto } from "next/font/google";
+import { Roboto } from "next/font/google";
+import localFont from "next/font/local";
 
-export const amiri = Amiri({
-  weight: ["400", "700"],
-  subsets: ["arabic", "latin"],
-  variable: "--font-sans",
+export const local = localFont({
+  src: "../../public/fonts/Traffic.ttf",
 });
 
 export const roboto = Roboto({
@@ -31,7 +30,7 @@ export const ltrTheme = createTheme({
 export const rtlTheme = createTheme({
   direction: "rtl",
   typography: {
-    fontFamily: amiri.style.fontFamily,
+    fontFamily: local.style.fontFamily,
   },
   components: {
     MuiTableCell: {

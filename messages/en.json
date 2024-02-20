@@ -44,6 +44,7 @@
       "display-rows": "{from} - {to} of {count, plural, =-1 {more than {to}} other {#}}",
       "header": {
         "actions": {
+          "filter-all": "Filter all",
           "sort": {
             "asc": "Sort Ascending",
             "desc": "Sort Descending"
@@ -53,6 +54,7 @@
           "drag-to-group": "Drag column here to add it to grouping"
         },
         "filters": {
+          "search": "Search",
           "contains": "Contains",
           "not-contains": "Not Contains",
           "equals": "Equals"

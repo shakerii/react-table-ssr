@@ -108,7 +108,7 @@ export const TextFilterInput = <TData,>({ column }: Props<TData>) => {
         fullWidth
         value={value ?? ""}
         onChange={handleChange}
-        placeholder="Search"
+        placeholder={t("search")}
       />
       <IconButton onClick={handleClickFilter}>
         <FilterAltIcon />

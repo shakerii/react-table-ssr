@@ -52,6 +52,7 @@ import {
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+import { GroupedHeaderBox } from "./GroupedHeaderBox";
 import { HeaderCell } from "./HeaderCell";
 import { RowActionsPopover } from "./RowActionsPopover";
 import { TableActions } from "./TableActions";
@@ -245,12 +246,12 @@ export const DataTable = <TData,>({
         <TableContainer
           ref={tableRef}
           sx={{
-            maxHeight: 440,
+            maxHeight: 500,
             border: 1,
             borderColor: (theme) => theme.palette.grey[300],
-            scrollBehavior: "unset",
           }}
         >
+          <GroupedHeaderBox table={table} />
           <Table stickyHeader size="small">
             <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
