@@ -4,11 +4,13 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import {
   Checkbox,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -39,7 +41,14 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
-import { type MouseEvent, useEffect, useState } from "react";
+import {
+  ElementRef,
+  Fragment,
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -89,6 +98,8 @@ export const DataTable = <TData,>({
   );
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<Element>();
+  const [overflowHeaderList, setOverflowHeaderList] = useState<string[]>([]);
+  const tableRef = useRef<ElementRef<typeof Table>>(null);
 
   const [openRowActions, setOpenRowActions] = useState<{
     position: { top: number; left: number };
@@ -119,6 +130,7 @@ export const DataTable = <TData,>({
     },
     enableRowSelection: true,
     paginateExpandedRows: false,
+    getRowCanExpand: () => true,
     onColumnOrderChange: setColumnOrder,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
@@ -201,6 +213,24 @@ export const DataTable = <TData,>({
     },
   ];
 
+  const element = tableRef.current;
+  const hasOverflowingChildren = element
+    ? element.offsetWidth < element.scrollWidth
+    : false;
+
+  useEffect(() => {
+    if (!hasOverflowingChildren) return;
+    const headers = table.getFlatHeaders().slice().reverse();
+    if (headers.length - overflowHeaderList.length < 2) return;
+    setOverflowHeaderList((list) => {
+      for (const header of headers) {
+        if (overflowHeaderList.includes(header.id)) continue;
+        return [...list, header.id];
+      }
+      return list;
+    });
+  }, [table, overflowHeaderList, hasOverflowingChildren]);
+
   return (
     <DndProvider backend={HTML5Backend}>
       <Paper sx={{ width: "100%", overflow: "hidden", px: 2 }}>
@@ -213,6 +243,7 @@ export const DataTable = <TData,>({
           setColumnSelectorAnchorEl={setColumnSelectorAnchorEl}
         />
         <TableContainer
+          ref={tableRef}
           sx={{
             maxHeight: 440,
             border: 1,
@@ -224,7 +255,7 @@ export const DataTable = <TData,>({
             <TableHead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
-                  <TableCell size="small">
+                  <TableCell>
                     <Checkbox
                       size="small"
                       sx={{ p: 0 }}
@@ -234,11 +265,19 @@ export const DataTable = <TData,>({
                     />
                   </TableCell>
                   {grouping.map((group) => (
-                    <TableCell size="small" key={group}></TableCell>
+                    <TableCell key={group}></TableCell>
                   ))}
-                  {headerGroup.headers.map((header) => (
-                    <HeaderCell key={header.id} table={table} header={header} />
-                  ))}
+                  {headerGroup.headers.map(
+                    (header) =>
+                      !overflowHeaderList.includes(header.id) && (
+                        <HeaderCell
+                          key={header.id}
+                          table={table}
+                          header={header}
+                        />
+                      ),
+                  )}
+                  {!!overflowHeaderList.length && <TableCell />}
                 </TableRow>
               ))}
             </TableHead>
@@ -274,7 +313,7 @@ export const DataTable = <TData,>({
                                   cursor: canExpand ? "pointer" : "normal",
                                 }}
                                 onClick={row.getToggleExpandedHandler()}
-                                colSpan={grouping.length + 1}
+                                colSpan={grouping.length + 2}
                               >
                                 <Typography variant="body1" textAlign="start">
                                   {flexRender(
@@ -321,48 +360,76 @@ export const DataTable = <TData,>({
                 }
 
                 return (
-                  <TableRow
-                    key={row.id}
-                    hover
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setOpenRowActions({
-                        row,
-                        position: { left: e.clientX, top: e.clientY },
-                      });
-                    }}
-                  >
-                    {grouping.map((group) => (
-                      <TableCell
-                        key={group}
-                        sx={{
-                          backgroundColor: (theme) => theme.palette.grey[300],
-                        }}
-                      ></TableCell>
-                    ))}
-                    <TableCell>
-                      <Checkbox
-                        size="small"
-                        sx={{ p: 0 }}
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        indeterminate={row.getIsSomeSelected()}
-                        onChange={row.getToggleSelectedHandler()}
-                      />
-                    </TableCell>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <TableCell size="small" key={cell.id}>
-                          <Typography textAlign="start">
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </Typography>
+                  <Fragment key={row.id}>
+                    <TableRow
+                      hover
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        setOpenRowActions({
+                          row,
+                          position: { left: e.clientX, top: e.clientY },
+                        });
+                      }}
+                    >
+                      {grouping.map((group) => (
+                        <TableCell
+                          key={group}
+                          sx={{
+                            backgroundColor: (theme) => theme.palette.grey[300],
+                          }}
+                        ></TableCell>
+                      ))}
+                      <TableCell>
+                        <Checkbox
+                          size="small"
+                          sx={{ p: 0 }}
+                          checked={row.getIsSelected()}
+                          disabled={!row.getCanSelect()}
+                          indeterminate={row.getIsSomeSelected()}
+                          onChange={row.getToggleSelectedHandler()}
+                        />
+                      </TableCell>
+                      {row.getVisibleCells().map((cell) => {
+                        if (overflowHeaderList.includes(cell.column.id)) {
+                          return null;
+                        }
+                        return (
+                          <TableCell key={cell.id}>
+                            <Typography textAlign="start">
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Typography>
+                          </TableCell>
+                        );
+                      })}
+                      {row.getCanExpand() && !!overflowHeaderList.length && (
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            sx={{ p: 0 }}
+                            onClick={row.getToggleExpandedHandler()}
+                          >
+                            <MoreHorizIcon />
+                          </IconButton>
                         </TableCell>
-                      );
-                    })}
-                  </TableRow>
+                      )}
+                    </TableRow>
+                    {row.getIsExpanded() && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={
+                            row.getVisibleCells().length -
+                            overflowHeaderList.length +
+                            2
+                          }
+                        >
+                          {overflowHeaderList.toString()}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
               <RowActionsPopover

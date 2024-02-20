@@ -19,6 +19,13 @@ export const ltrTheme = createTheme({
   typography: {
     fontFamily: roboto.style.fontFamily,
   },
+  components: {
+    MuiTableCell: {
+      defaultProps: {
+        size: "small",
+      },
+    },
+  },
 });
 
 export const rtlTheme = createTheme({
@@ -27,6 +34,11 @@ export const rtlTheme = createTheme({
     fontFamily: amiri.style.fontFamily,
   },
   components: {
+    MuiTableCell: {
+      defaultProps: {
+        size: "small",
+      },
+    },
     MuiDrawer: {
       styleOverrides: {
         paperAnchorRight: ({ ownerState }) => ({

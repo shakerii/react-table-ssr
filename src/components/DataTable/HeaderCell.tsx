@@ -136,7 +136,6 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
   return (
     <TableCell
       ref={dropRef}
-      size="small"
       colSpan={header.colSpan}
       style={{ opacity: isDragging ? 0.5 : 1 }}
     >
