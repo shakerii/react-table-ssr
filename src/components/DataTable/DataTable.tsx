@@ -42,7 +42,7 @@ import {
 } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import {
-  ElementRef,
+  type ElementRef,
   Fragment,
   type MouseEvent,
   useEffect,
