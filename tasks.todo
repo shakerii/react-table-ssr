@@ -16,3 +16,13 @@ Data table:
         ✔ Filters (contains, not contains, ...) @done (2/19/2024, 3:38:33 PM)
     ☐ Three dots
     ☐ Change export libraries to : jspdf, file-saver-es, exceljs
+
+
+
+Grouping aggregation row
+Detail modal
+Date filter
+Smaller filter input widths
+Full screen data grid table
+save visible columns
++ zoom to full screen
