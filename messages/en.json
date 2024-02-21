@@ -51,7 +51,9 @@
           },
           "group": "Group Column",
           "ungroup": "Ungroup Column",
-          "drag-to-group": "Drag column here to add it to grouping"
+          "drag-to-group": "Drag column here to add it to grouping",
+          "zoom-to-fullscreen": "Zoom to fullscreen",
+          "undo-zoom": "Undo zoom"
         },
         "filters": {
           "search": "Search",

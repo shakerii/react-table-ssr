@@ -45,7 +45,14 @@ export default function RootLayout({
         >
           <Sidebar />
         </Paper>
-        <Box flex={1} px={{ xs: 2, md: 4 }} overflow="auto">
+        <Box
+          flex={1}
+          px={{ xs: 2, md: 4 }}
+          pb={5}
+          overflow="auto"
+          display="flex"
+          flexDirection="column"
+        >
           {children}
         </Box>
       </Box>

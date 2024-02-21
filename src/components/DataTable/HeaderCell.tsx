@@ -159,17 +159,18 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
             </>
           )}
         </Typography>
-        <Box mt={1} display="flex" flexWrap="nowrap">
+        <Box mt={1} display="flex" alignItems="center" flexWrap="nowrap">
           <Box>
             <Filter table={table} column={header.column} />
           </Box>
           <Box>
             <IconButton
+              size="small"
               ref={dragRef}
               onClick={handleClickOptions}
               sx={{ cursor: isDragging ? "grabbing" : "grab" }}
             >
-              <MoreVertIcon />
+              <MoreVertIcon fontSize="small" />
             </IconButton>
             <Menu
               anchorEl={optionsAnchorEl}

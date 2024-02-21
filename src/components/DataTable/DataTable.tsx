@@ -5,6 +5,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -109,9 +111,12 @@ export const DataTable = <TData,>({
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<Element>();
   const [overflowColumnList, setOverflowColumnList] = useState<string[]>([]);
-  const detailContainerRef = useRef<ElementRef<typeof Paper>>(null);
   const [openDetails, setOpenDetails] = useState<Row<TData>>();
+  const [isZoomFullScreen, setIsZoomFullScreen] = useState(false);
+
   const tableRef = useRef<ElementRef<typeof Table>>(null);
+  const containerRef = useRef<ElementRef<"div">>(null);
+  const groupedHeaderRef = useRef<ElementRef<"div">>(null);
 
   const [openRowActions, setOpenRowActions] = useState<{
     position: { top: number; left: number };
@@ -218,6 +223,14 @@ export const DataTable = <TData,>({
       onClick: handleExportToCSV,
     },
     {
+      title: isZoomFullScreen
+        ? t("header.actions.undo-zoom")
+        : t("header.actions.zoom-to-fullscreen"),
+      icon: isZoomFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />,
+      visible: true,
+      onClick: () => setIsZoomFullScreen((isZoom) => !isZoom),
+    },
+    {
       title: t("refresh"),
       icon: <RefreshIcon />,
       visible: !!onRefresh,
@@ -241,7 +254,7 @@ export const DataTable = <TData,>({
       }
       return columnList;
     });
-  }, [table, overflowColumnList, hasOverflowingColumns]);
+  }, [table, overflowColumnList, hasOverflowingColumns, flatHeaders]);
 
   const totalColumns =
     1 +
@@ -251,7 +264,16 @@ export const DataTable = <TData,>({
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <Paper sx={{ width: "100%", overflow: "hidden", px: 2 }}>
+      <Paper
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          px: 2,
+        }}
+      >
         <TableActions
           table={table}
           actions={globalActions}
@@ -261,21 +283,31 @@ export const DataTable = <TData,>({
           setColumnSelectorAnchorEl={setColumnSelectorAnchorEl}
         />
         <Box
+          ref={containerRef}
           sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
             border: 1,
             borderColor: (theme) => theme.palette.grey[300],
           }}
         >
-          <GroupedHeaderBox table={table} />
-          <Divider />
+          <Box ref={groupedHeaderRef}>
+            <GroupedHeaderBox table={table} />
+            <Divider />
+          </Box>
           <TableContainer
             ref={tableRef}
             sx={{
-              maxHeight: 500,
+              maxHeight:
+                containerRef.current && groupedHeaderRef.current
+                  ? containerRef.current.clientHeight -
+                    groupedHeaderRef.current.clientHeight
+                  : "500px",
               position: "relative",
             }}
           >
-            <Slide
+            {/* <Slide
               direction="left"
               in={!!openDetails}
               container={tableRef.current}
@@ -304,7 +336,7 @@ export const DataTable = <TData,>({
                   </Box>
                 )}
               </Paper>
-            </Slide>
+            </Slide> */}
             <Table stickyHeader size="small">
               <TableHead>
                 {table.getHeaderGroups().map((headerGroup) => (

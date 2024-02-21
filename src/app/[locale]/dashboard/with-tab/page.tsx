@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useLocale, useTranslations } from "next-intl";
-import { type ReactElement, useMemo } from "react";
+import { ElementRef, type ReactElement, useMemo, useRef } from "react";
 
 import {
   type Columns,
@@ -224,7 +224,10 @@ export default function Home() {
       {tabs.map((tab, index) => (
         <Box
           key={tab.key}
-          sx={{ display: currentTabIndex === index ? "block" : "none" }}
+          sx={{
+            display: currentTabIndex === index ? "block" : "none",
+            flexGrow: 1,
+          }}
         >
           {tab.content ? (
             tab.content

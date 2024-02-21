@@ -110,8 +110,8 @@ export const TextFilterInput = <TData,>({ column }: Props<TData>) => {
         onChange={handleChange}
         placeholder={t("search")}
       />
-      <IconButton onClick={handleClickFilter}>
-        <FilterAltIcon />
+      <IconButton size="small" onClick={handleClickFilter}>
+        <FilterAltIcon fontSize="small" />
       </IconButton>
       <Menu
         anchorEl={filterAnchorEl}

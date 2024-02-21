@@ -24,6 +24,13 @@ export const ltrTheme = createTheme({
         size: "small",
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          padding: "5px 10px",
+        },
+      },
+    },
   },
 });
 
@@ -36,6 +43,13 @@ export const rtlTheme = createTheme({
     MuiTableCell: {
       defaultProps: {
         size: "small",
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          padding: "5px 10px",
+        },
       },
     },
     MuiDrawer: {
