@@ -3,14 +3,7 @@
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Tab,
-  Tabs,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import type { Product } from "@prisma/client";
 import { useLocale, useTranslations } from "next-intl";
 import { type ReactElement, useMemo } from "react";
@@ -19,7 +12,6 @@ import {
   type Columns,
   DataTable,
   type RowAction,
-  type VisibilityState,
 } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
@@ -42,8 +34,6 @@ export default function Home() {
     locale in localeCodes
       ? localeCodes[locale as keyof typeof localeCodes]
       : "en-US";
-  const theme = useTheme();
-  const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const { tabs, currentTabIndex, setCurrentTabIndex, openTab, closeTab } =
     useTabs<TKey, Tab>({
       defaultTabs: [
@@ -126,16 +116,6 @@ export default function Home() {
       },
     ];
   }, [t, localeCode]);
-
-  const defaultVisibilityState = useMemo<VisibilityState | undefined>(() => {
-    if (isSmUp) {
-      return undefined;
-    }
-    return {
-      description: false,
-      updatedAt: false,
-    };
-  }, [isSmUp]);
 
   const rowActions = useMemo<RowAction<Product>[]>(() => {
     return [
@@ -236,7 +216,6 @@ export default function Home() {
               data={data}
               columns={columns}
               rowActions={rowActions}
-              defaultVisibilityState={defaultVisibilityState}
               exportToCSV
               exportToPDF
               onCreate={handleCreate}

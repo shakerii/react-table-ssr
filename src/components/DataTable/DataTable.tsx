@@ -84,7 +84,6 @@ import {
 type Props<TData> = {
   data: TData[];
   columns: Columns<TData>;
-  defaultVisibilityState?: VisibilityState;
   exportToPDF?: boolean;
   exportToCSV?: boolean;
   onCreate?: () => void;
@@ -96,7 +95,6 @@ type Props<TData> = {
 export const DataTable = <TData,>({
   data,
   columns,
-  defaultVisibilityState,
   exportToCSV,
   exportToPDF,
   rowActions,
@@ -115,9 +113,7 @@ export const DataTable = <TData,>({
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    defaultVisibilityState ?? {},
-  );
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<Element>();
   const [overflowColumnList, setOverflowColumnList] = useState<string[]>([]);
@@ -298,7 +294,7 @@ export const DataTable = <TData,>({
           sx={{
             flexGrow: 1,
             display: "flex",
-            flexDirection: pinRowDetails ? "row" : "column",
+            flexDirection: isSmUp && pinRowDetails ? "row" : "column",
             border: 1,
             borderColor: (theme) => theme.palette.grey[300],
           }}
@@ -573,7 +569,7 @@ export const DataTable = <TData,>({
               </Table>
             </TableContainer>
           </Box>
-          {pinRowDetails ? (
+          {isSmUp && pinRowDetails ? (
             <Box
               key={openRowDetails?.id}
               borderRight={isRTL ? 1 : 0}

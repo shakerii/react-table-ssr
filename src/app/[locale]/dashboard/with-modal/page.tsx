@@ -20,7 +20,6 @@ import {
   type Columns,
   DataTable,
   type RowAction,
-  type VisibilityState,
 } from "~/components/DataTable";
 import { ProductForm } from "~/components/forms/ProductForm";
 import { DataTableSkeleton } from "~/components/skeleton/DataTableSkeleton";
@@ -117,16 +116,6 @@ export default function Home() {
     ];
   }, [t, localeCode]);
 
-  const defaultVisibilityState = useMemo<VisibilityState | undefined>(() => {
-    if (isSmUp) {
-      return undefined;
-    }
-    return {
-      description: false,
-      updatedAt: false,
-    };
-  }, [isSmUp]);
-
   const rowActions = useMemo<RowAction<Product>[]>(() => {
     return [
       {
@@ -189,7 +178,6 @@ export default function Home() {
         data={data}
         columns={columns}
         rowActions={rowActions}
-        defaultVisibilityState={defaultVisibilityState}
         exportToCSV
         exportToPDF
         DetailComponent={({ row }) => (

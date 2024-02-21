@@ -160,10 +160,10 @@ export const HeaderCell = <TData,>({ header, table }: Props<TData>) => {
           )}
         </Typography>
         <Box mt={1} display="flex" alignItems="center" flexWrap="nowrap">
-          <Box>
+          <Box flexGrow={1}>
             <Filter table={table} column={header.column} />
           </Box>
-          <Box>
+          <Box flexGrow={0}>
             <IconButton
               size="small"
               ref={dragRef}
