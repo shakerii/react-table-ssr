@@ -42,7 +42,7 @@ export const RangeFilterInput = <TData,>({ column }: Props<TData>) => {
           type="number"
           size="small"
           fullWidth
-          sx={{ minWidth: 75 }}
+          inputProps={{ style: { minWidth: 75, padding: "5px 10px" } }}
           value={(columnFilterValue as MinMax)?.[0] ?? ""}
           onChange={handleMinChange}
           placeholder={`Min ${minmaxValue?.[0] ? `(${minmaxValue?.[0]})` : ""}`}
@@ -53,7 +53,7 @@ export const RangeFilterInput = <TData,>({ column }: Props<TData>) => {
           type="number"
           size="small"
           fullWidth
-          sx={{ minWidth: 75 }}
+          inputProps={{ style: { minWidth: 75, padding: "5px 10px" } }}
           value={(columnFilterValue as MinMax)?.[1] ?? ""}
           onChange={handleMaxChange}
           placeholder={`Max ${minmaxValue?.[1] ? `(${minmaxValue?.[1]})` : ""}`}

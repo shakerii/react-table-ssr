@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
+  Box,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -159,11 +160,10 @@ export default function Home() {
         onClose={() => setProduct(undefined)}
         open={open}
       >
-        <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
+        <DialogTitle sx={{ m: 0, p: 2 }}>
           {product ? t("with-tab.update", product) : t("with-tab.create")}
         </DialogTitle>
         <IconButton
-          aria-label="close"
           onClick={() => setProduct(undefined)}
           sx={{
             position: "absolute",
@@ -193,15 +193,17 @@ export default function Home() {
         exportToCSV
         exportToPDF
         DetailComponent={({ row }) => (
-          <ProductForm
-            defaultValues={row.original}
-            onSubmit={(value) =>
-              updatePropertyMutation.mutate({
-                id: row.original.id,
-                ...value,
-              })
-            }
-          />
+          <Box pt={2} px={2} minWidth={400}>
+            <ProductForm
+              defaultValues={row.original}
+              onSubmit={(value) =>
+                updatePropertyMutation.mutate({
+                  id: row.original.id,
+                  ...value,
+                })
+              }
+            />
+          </Box>
         )}
         onCreate={() => setProduct(null)}
         onRefresh={() => getAllProductQuery.refetch()}

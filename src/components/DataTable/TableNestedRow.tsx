@@ -9,11 +9,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Row, Table, flexRender } from "@tanstack/react-table";
+import { type Row, type Table, flexRender } from "@tanstack/react-table";
 import { Fragment, useState } from "react";
 
 import { RowActionsPopover } from "./RowActionsPopover";
-import { RowAction } from "./types";
+import type { RowAction } from "./types";
 
 type Props<TData> = {
   table: Table<TData>;

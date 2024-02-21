@@ -9,16 +9,20 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import {
   Box,
   Checkbox,
+  DialogContent,
+  DialogTitle,
   Divider,
+  Drawer,
   Grid,
   IconButton,
   Paper,
-  Slide,
   Table,
   TableBody,
   TableCell,
@@ -27,6 +31,8 @@ import {
   TablePagination,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   type ColumnFiltersState,
@@ -50,16 +56,17 @@ import {
 import { useTranslations } from "next-intl";
 import {
   type ElementRef,
-  FC,
+  type FC,
   Fragment,
   type MouseEvent,
-  ReactElement,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+
+import { useIsRTL } from "~/hooks/useIsRTL";
 
 import { GroupedHeaderBox } from "./GroupedHeaderBox";
 import { HeaderCell } from "./HeaderCell";
@@ -98,6 +105,9 @@ export const DataTable = <TData,>({
   onRefresh,
 }: Props<TData>) => {
   const t = useTranslations("components.data-table");
+  const isRTL = useIsRTL();
+  const theme = useTheme();
+  const isSmUp = useMediaQuery(theme.breakpoints.up("sm"));
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>(
     columns.map((column) => column.id!),
   );
@@ -111,7 +121,8 @@ export const DataTable = <TData,>({
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<Element>();
   const [overflowColumnList, setOverflowColumnList] = useState<string[]>([]);
-  const [openDetails, setOpenDetails] = useState<Row<TData>>();
+  const [openRowDetails, setOpenRowDetails] = useState<Row<TData>>();
+  const [pinRowDetails, setPinRowDetails] = useState(false);
   const [isZoomFullScreen, setIsZoomFullScreen] = useState(false);
 
   const tableRef = useRef<ElementRef<typeof Table>>(null);
@@ -287,125 +298,117 @@ export const DataTable = <TData,>({
           sx={{
             flexGrow: 1,
             display: "flex",
-            flexDirection: "column",
+            flexDirection: pinRowDetails ? "row" : "column",
             border: 1,
             borderColor: (theme) => theme.palette.grey[300],
           }}
         >
-          <Box ref={groupedHeaderRef}>
-            <GroupedHeaderBox table={table} />
-            <Divider />
-          </Box>
-          <TableContainer
-            ref={tableRef}
-            sx={{
-              maxHeight:
-                containerRef.current && groupedHeaderRef.current
-                  ? containerRef.current.clientHeight -
-                    groupedHeaderRef.current.clientHeight
-                  : "500px",
-              position: "relative",
-            }}
-          >
-            {/* <Slide
-              direction="left"
-              in={!!openDetails}
-              container={tableRef.current}
+          <Box flexGrow={1}>
+            <Box ref={groupedHeaderRef}>
+              <GroupedHeaderBox table={table} />
+              <Divider />
+            </Box>
+            <TableContainer
+              ref={tableRef}
+              sx={{
+                maxHeight:
+                  containerRef.current && groupedHeaderRef.current
+                    ? containerRef.current.clientHeight -
+                      groupedHeaderRef.current.clientHeight
+                    : "500px",
+                position: "relative",
+              }}
             >
-              <Paper
-                elevation={4}
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  top: 0,
-                  zIndex: 5,
-                  height: "100%",
-                  overflow: "hidden",
-                }}
-              >
-                <IconButton
-                  size="small"
-                  sx={{ position: "absolute", top: 6, right: 6 }}
-                  onClick={() => setOpenDetails(undefined)}
-                >
-                  <CloseIcon />
-                </IconButton>
-                {openDetails && (
-                  <Box mt={4} p={2} minWidth={400}>
-                    <DetailComponent row={openDetails} />
-                  </Box>
-                )}
-              </Paper>
-            </Slide> */}
-            <Table stickyHeader size="small">
-              <TableHead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {grouping.map((group) => (
-                      <TableCell key={group} sx={{ width: 0 }} />
-                    ))}
-                    <TableCell>
-                      <Checkbox
-                        size="small"
-                        sx={{ p: 0 }}
-                        checked={table.getIsAllRowsSelected()}
-                        indeterminate={table.getIsSomeRowsSelected()}
-                        onChange={table.getToggleAllRowsSelectedHandler()}
-                      />
-                    </TableCell>
-                    {headerGroup.headers.map(
-                      (header) =>
-                        !overflowColumnList.includes(header.id) && (
-                          <HeaderCell
-                            key={header.id}
-                            table={table}
-                            header={header}
-                          />
-                        ),
-                    )}
-                    {!!overflowColumnList.length && <TableCell width={0} />}
-                  </TableRow>
-                ))}
-              </TableHead>
-              <TableBody>
-                {table.getRowModel().rows.map((row) => {
-                  if (row.getIsGrouped()) {
-                    const canExpand = row.getCanExpand();
-                    return (
-                      <TableRow key={row.id}>
-                        {!!row.depth && (
-                          <TableCell
-                            colSpan={row.depth}
-                            sx={{
-                              width: 0,
-                              backgroundColor: (theme) =>
-                                theme.palette.grey[300],
-                              cursor: canExpand ? "pointer" : "normal",
-                            }}
-                            onClick={row.getToggleExpandedHandler()}
-                          />
-                        )}
-                        {row.getVisibleCells().map((cell) => {
-                          if (!cell.getIsGrouped()) {
-                            return null;
-                          }
-                          return (
-                            <Fragment key={cell.id}>
-                              <TableCell
-                                sx={{
-                                  backgroundColor: (theme) =>
-                                    theme.palette.grey[300],
-                                  cursor: canExpand ? "pointer" : "normal",
-                                }}
-                                onClick={row.getToggleExpandedHandler()}
-                                align="right"
-                              >
-                                {row.getIsExpanded() ? (
-                                  <ExpandLessIcon />
-                                ) : (
-                                  <ExpandMoreIcon />
-                                )}
-                              </TableCell>
+              <Table stickyHeader size="small">
+                <TableHead>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {grouping.map((group) => (
+                        <TableCell key={group} sx={{ width: 0 }} />
+                      ))}
+                      <TableCell>
+                        <Checkbox
+                          size="small"
+                          sx={{ p: 0 }}
+                          checked={table.getIsAllRowsSelected()}
+                          indeterminate={table.getIsSomeRowsSelected()}
+                          onChange={table.getToggleAllRowsSelectedHandler()}
+                        />
+                      </TableCell>
+                      {headerGroup.headers.map(
+                        (header) =>
+                          !overflowColumnList.includes(header.id) && (
+                            <HeaderCell
+                              key={header.id}
+                              table={table}
+                              header={header}
+                            />
+                          ),
+                      )}
+                      {!!overflowColumnList.length && <TableCell width={0} />}
+                    </TableRow>
+                  ))}
+                </TableHead>
+                <TableBody>
+                  {table.getRowModel().rows.map((row) => {
+                    if (row.getIsGrouped()) {
+                      const canExpand = row.getCanExpand();
+                      return (
+                        <TableRow key={row.id}>
+                          {!!row.depth && (
+                            <TableCell
+                              colSpan={row.depth}
+                              sx={{
+                                width: 0,
+                                backgroundColor: (theme) =>
+                                  theme.palette.grey[300],
+                                cursor: canExpand ? "pointer" : "normal",
+                              }}
+                              onClick={row.getToggleExpandedHandler()}
+                            />
+                          )}
+                          {row.getVisibleCells().map((cell) => {
+                            if (!cell.getIsGrouped()) {
+                              return null;
+                            }
+                            return (
+                              <Fragment key={cell.id}>
+                                <TableCell
+                                  sx={{
+                                    backgroundColor: (theme) =>
+                                      theme.palette.grey[300],
+                                    cursor: canExpand ? "pointer" : "normal",
+                                  }}
+                                  onClick={row.getToggleExpandedHandler()}
+                                  align="right"
+                                >
+                                  {row.getIsExpanded() ? (
+                                    <ExpandLessIcon />
+                                  ) : (
+                                    <ExpandMoreIcon />
+                                  )}
+                                </TableCell>
+                                <TableCell
+                                  key={cell.id}
+                                  sx={{
+                                    backgroundColor: (theme) =>
+                                      theme.palette.grey[300],
+                                    cursor: canExpand ? "pointer" : "normal",
+                                  }}
+                                  onClick={row.getToggleExpandedHandler()}
+                                  colSpan={totalColumns - 1}
+                                >
+                                  <Typography variant="body1" textAlign="start">
+                                    {flexRender(
+                                      cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </Typography>
+                                </TableCell>
+                              </Fragment>
+                            );
+
+                            return (
                               <TableCell
                                 key={cell.id}
                                 sx={{
@@ -414,178 +417,223 @@ export const DataTable = <TData,>({
                                   cursor: canExpand ? "pointer" : "normal",
                                 }}
                                 onClick={row.getToggleExpandedHandler()}
-                                colSpan={totalColumns - 1}
                               >
-                                <Typography variant="body1" textAlign="start">
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </Typography>
-                              </TableCell>
-                            </Fragment>
-                          );
-
-                          return (
-                            <TableCell
-                              key={cell.id}
-                              sx={{
-                                backgroundColor: (theme) =>
-                                  theme.palette.grey[300],
-                                cursor: canExpand ? "pointer" : "normal",
-                              }}
-                              onClick={row.getToggleExpandedHandler()}
-                            >
-                              {cell.getIsAggregated() ? (
-                                <Typography variant="body1" textAlign="start">
-                                  {flexRender(
-                                    cell.column.columnDef.aggregatedCell ??
+                                {cell.getIsAggregated() ? (
+                                  <Typography variant="body1" textAlign="start">
+                                    {flexRender(
+                                      cell.column.columnDef.aggregatedCell ??
+                                        cell.column.columnDef.cell,
+                                      cell.getContext(),
+                                    )}
+                                  </Typography>
+                                ) : cell.getIsPlaceholder() ? null : (
+                                  <Typography variant="body1" textAlign="start">
+                                    {flexRender(
                                       cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </Typography>
-                              ) : cell.getIsPlaceholder() ? null : (
-                                <Typography variant="body1" textAlign="start">
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </Typography>
-                              )}
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  }
-
-                  return (
-                    <Fragment key={row.id}>
-                      <TableRow
-                        hover
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          setOpenRowActions({
-                            row,
-                            position: { left: e.clientX, top: e.clientY },
-                          });
-                        }}
-                        onClick={() => setOpenDetails(row)}
-                      >
-                        {grouping.map((group) => (
-                          <TableCell
-                            key={group}
-                            sx={{
-                              width: 0,
-                              backgroundColor: (theme) =>
-                                theme.palette.grey[300],
-                            }}
-                          />
-                        ))}
-                        <TableCell>
-                          <Checkbox
-                            size="small"
-                            sx={{ p: 0 }}
-                            checked={row.getIsSelected()}
-                            disabled={!row.getCanSelect()}
-                            indeterminate={row.getIsSomeSelected()}
-                            onChange={row.getToggleSelectedHandler()}
-                          />
-                        </TableCell>
-                        {row.getVisibleCells().map((cell) => {
-                          if (overflowColumnList.includes(cell.column.id)) {
-                            return null;
-                          }
-                          return (
-                            <TableCell key={cell.id}>
-                              <Typography textAlign="start">
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
+                                      cell.getContext(),
+                                    )}
+                                  </Typography>
                                 )}
-                              </Typography>
-                            </TableCell>
-                          );
-                        })}
-                        {row.getCanExpand() && !!overflowColumnList.length && (
-                          <TableCell>
-                            <IconButton
-                              size="small"
-                              sx={{ p: 0 }}
-                              onClick={row.getToggleExpandedHandler()}
-                            >
-                              <MoreHorizIcon />
-                            </IconButton>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                      {row.getIsExpanded() && (
-                        <TableRow>
-                          {!!grouping.length && (
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
+                    }
+
+                    return (
+                      <Fragment key={row.id}>
+                        <TableRow
+                          hover
+                          onContextMenu={(e) => {
+                            e.preventDefault();
+                            setOpenRowActions({
+                              row,
+                              position: { left: e.clientX, top: e.clientY },
+                            });
+                          }}
+                          onClick={() => setOpenRowDetails(row)}
+                        >
+                          {grouping.map((group) => (
                             <TableCell
-                              colSpan={row.depth}
+                              key={group}
                               sx={{
                                 width: 0,
                                 backgroundColor: (theme) =>
                                   theme.palette.grey[300],
                               }}
                             />
-                          )}
-                          <TableCell colSpan={totalColumns - row.depth}>
-                            <Grid container>
-                              {overflowColumnList.map((columnId) => {
-                                const column = table.getColumn(columnId);
-                                if (!column) {
-                                  return null;
-                                }
-                                const cell = row
-                                  .getVisibleCells()
-                                  .find((cell) => cell.column === column);
-                                if (!cell) {
-                                  return null;
-                                }
-                                return (
-                                  <Grid
-                                    key={columnId}
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    lg={3}
-                                  >
-                                    <Typography
-                                      variant="subtitle1"
-                                      textAlign="start"
-                                    >
-                                      {String(column.columnDef.header)}
-                                    </Typography>
-                                    <Typography
-                                      variant="body2"
-                                      textAlign="start"
-                                    >
-                                      {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext(),
-                                      )}
-                                    </Typography>
-                                  </Grid>
-                                );
-                              })}
-                            </Grid>
+                          ))}
+                          <TableCell>
+                            <Checkbox
+                              size="small"
+                              sx={{ p: 0 }}
+                              checked={row.getIsSelected()}
+                              disabled={!row.getCanSelect()}
+                              indeterminate={row.getIsSomeSelected()}
+                              onChange={row.getToggleSelectedHandler()}
+                            />
                           </TableCell>
+                          {row.getVisibleCells().map((cell) => {
+                            if (overflowColumnList.includes(cell.column.id)) {
+                              return null;
+                            }
+                            return (
+                              <TableCell key={cell.id}>
+                                <Typography textAlign="start">
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </Typography>
+                              </TableCell>
+                            );
+                          })}
+                          {row.getCanExpand() &&
+                            !!overflowColumnList.length && (
+                              <TableCell>
+                                <IconButton
+                                  size="small"
+                                  sx={{ p: 0 }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    row.toggleExpanded();
+                                  }}
+                                >
+                                  <MoreHorizIcon />
+                                </IconButton>
+                              </TableCell>
+                            )}
                         </TableRow>
-                      )}
-                    </Fragment>
-                  );
-                })}
-                <RowActionsPopover
-                  position={openRowActions?.position}
-                  row={openRowActions?.row}
-                  actions={rowActions}
-                  onClose={() => setOpenRowActions(undefined)}
-                />
-              </TableBody>
-            </Table>
-          </TableContainer>
+                        {row.getIsExpanded() && (
+                          <TableRow>
+                            {!!grouping.length && (
+                              <TableCell
+                                colSpan={row.depth}
+                                sx={{
+                                  width: 0,
+                                  backgroundColor: (theme) =>
+                                    theme.palette.grey[300],
+                                }}
+                              />
+                            )}
+                            <TableCell colSpan={totalColumns - row.depth}>
+                              <Grid container>
+                                {overflowColumnList.map((columnId) => {
+                                  const column = table.getColumn(columnId);
+                                  if (!column) {
+                                    return null;
+                                  }
+                                  const cell = row
+                                    .getVisibleCells()
+                                    .find((cell) => cell.column === column);
+                                  if (!cell) {
+                                    return null;
+                                  }
+                                  return (
+                                    <Grid
+                                      key={columnId}
+                                      item
+                                      xs={12}
+                                      sm={6}
+                                      lg={3}
+                                    >
+                                      <Typography
+                                        variant="subtitle1"
+                                        textAlign="start"
+                                      >
+                                        {String(column.columnDef.header)}
+                                      </Typography>
+                                      <Typography
+                                        variant="body2"
+                                        textAlign="start"
+                                      >
+                                        {flexRender(
+                                          cell.column.columnDef.cell,
+                                          cell.getContext(),
+                                        )}
+                                      </Typography>
+                                    </Grid>
+                                  );
+                                })}
+                              </Grid>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                  <RowActionsPopover
+                    position={openRowActions?.position}
+                    row={openRowActions?.row}
+                    actions={rowActions}
+                    onClose={() => setOpenRowActions(undefined)}
+                  />
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+          {pinRowDetails ? (
+            <Box
+              key={openRowDetails?.id}
+              borderRight={isRTL ? 1 : 0}
+              borderLeft={isRTL ? 0 : 1}
+              borderBottom={1}
+              borderColor={(theme) => theme.palette.grey[300]}
+            >
+              <DialogTitle display="flex" justifyContent="start" sx={{ p: 1 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => setOpenRowDetails(undefined)}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => setPinRowDetails((pin) => !pin)}
+                >
+                  {pinRowDetails ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                </IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ p: 0 }}>
+                {openRowDetails && <DetailComponent row={openRowDetails} />}
+              </DialogContent>
+            </Box>
+          ) : (
+            <Drawer
+              open={!!openRowDetails}
+              anchor={isRTL ? "left" : "right"}
+              hideBackdrop
+              PaperProps={{
+                style: {
+                  position: "absolute",
+                  width: isSmUp ? "max-content" : "100%",
+                },
+              }}
+              ModalProps={{
+                container: tableRef.current,
+                style: { position: "absolute" },
+              }}
+            >
+              <DialogTitle display="flex" justifyContent="start" sx={{ p: 0 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => setOpenRowDetails(undefined)}
+                >
+                  <CloseIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => setPinRowDetails((pin) => !pin)}
+                >
+                  {pinRowDetails ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                </IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ p: 0 }}>
+                {openRowDetails && <DetailComponent row={openRowDetails} />}
+              </DialogContent>
+            </Drawer>
+          )}
         </Box>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 100]}

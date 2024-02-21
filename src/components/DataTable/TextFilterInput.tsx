@@ -107,6 +107,7 @@ export const TextFilterInput = <TData,>({ column }: Props<TData>) => {
         size="small"
         fullWidth
         value={value ?? ""}
+        inputProps={{ style: { minWidth: 75, padding: "5px 10px" } }}
         onChange={handleChange}
         placeholder={t("search")}
       />
