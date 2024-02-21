@@ -24,11 +24,7 @@ export const GroupedHeaderBox = <TData,>({ table }: Props<TData>) => {
     .filter((header) => header.column.getIsGrouped());
 
   return (
-    <Box
-      p={2}
-      borderBottom={1}
-      borderColor={(theme) => theme.palette.grey[300]}
-    >
+    <Box p={2}>
       <Stack direction="row" spacing={1} ref={dropRef}>
         {groupedHeaders.length === 0 && (
           <Typography>{t("drag-to-group")}</Typography>

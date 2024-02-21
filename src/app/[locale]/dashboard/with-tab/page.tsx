@@ -237,6 +237,17 @@ export default function Home() {
               exportToCSV
               exportToPDF
               onCreate={handleCreate}
+              DetailComponent={({ row }) => (
+                <ProductForm
+                  defaultValues={row.original}
+                  onSubmit={(value) =>
+                    updatePropertyMutation.mutate({
+                      id: row.original.id,
+                      ...value,
+                    })
+                  }
+                />
+              )}
               onRefresh={() => getAllProductQuery.refetch()}
             />
           )}

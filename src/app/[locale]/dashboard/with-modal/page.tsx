@@ -192,6 +192,17 @@ export default function Home() {
         defaultVisibilityState={defaultVisibilityState}
         exportToCSV
         exportToPDF
+        DetailComponent={({ row }) => (
+          <ProductForm
+            defaultValues={row.original}
+            onSubmit={(value) =>
+              updatePropertyMutation.mutate({
+                id: row.original.id,
+                ...value,
+              })
+            }
+          />
+        )}
         onCreate={() => setProduct(null)}
         onRefresh={() => getAllProductQuery.refetch()}
       />

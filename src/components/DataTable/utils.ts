@@ -80,12 +80,6 @@ export const exportRowsToCSV = <TData>({
   rows: Row<TData>[];
   headers: Header<TData, unknown>[];
 }) => {
-  console.log({
-    columnHeaders: headers.map((header) => ({
-      key: header.column.id,
-      displayLabel: String(header.column.columnDef.header),
-    })),
-  });
   const csvConfig = mkConfig({
     filename,
     fieldSeparator: ",",
