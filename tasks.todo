@@ -1,11 +1,10 @@
 Data table:
-    ☐ Grouping aggregation row
+    ✔ Grouping aggregation row @done (2/22/2024, 1:39:37 PM)
     ✔ Three dots click bug @done (2/21/2024, 3:03:28 PM)
     ✔ Detailed row modal @done (2/21/2024, 3:03:23 PM)
-    ☐ Add Date filter
     ✔ Smaller filter input widths @done (2/21/2024, 2:21:41 PM)
     ✔ Stretch data table to full screen @done (2/21/2024, 2:14:47 PM)
+    ☐ Add Date filter
     ☐ Save visible columns
     ☐ + Zoom table to full screen
     ☐ + Change export libraries to : jspdf, file-saver-es, exceljs
-

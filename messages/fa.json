@@ -81,6 +81,9 @@
       "description": "توضیحات",
       "created-at": "زمان تولید",
       "updated-at": "زمان به‌روزرسانی"
+    },
+    "aggregations": {
+      "count": "تعداد: {count, number}"
     }
   }
 }

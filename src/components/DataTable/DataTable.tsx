@@ -3,11 +3,8 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import DescriptionIcon from "@mui/icons-material/Description";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
@@ -20,7 +17,6 @@ import {
   DialogTitle,
   Divider,
   Drawer,
-  Grid,
   IconButton,
   Paper,
   Table,
@@ -30,7 +26,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -41,7 +36,6 @@ import {
   type Row,
   type RowSelectionState,
   type VisibilityState,
-  flexRender,
   getCoreRowModel,
   getExpandedRowModel,
   getFacetedMinMaxValues,
@@ -57,7 +51,6 @@ import { useTranslations } from "next-intl";
 import {
   type ElementRef,
   type FC,
-  Fragment,
   type MouseEvent,
   useEffect,
   useRef,
@@ -72,6 +65,7 @@ import { GroupedHeaderBox } from "./GroupedHeaderBox";
 import { HeaderCell } from "./HeaderCell";
 import { RowActionsPopover } from "./RowActionsPopover";
 import { TableActions } from "./TableActions";
+import { TableNestedRow } from "./TableNestedRow";
 import { customFilter } from "./TextFilterInput";
 import type { Columns, RowAction } from "./types";
 import {
@@ -347,216 +341,16 @@ export const DataTable = <TData,>({
                 </TableHead>
                 <TableBody>
                   {table.getRowModel().rows.map((row) => {
-                    if (row.getIsGrouped()) {
-                      const canExpand = row.getCanExpand();
-                      return (
-                        <TableRow key={row.id}>
-                          {!!row.depth && (
-                            <TableCell
-                              colSpan={row.depth}
-                              sx={{
-                                width: 0,
-                                backgroundColor: (theme) =>
-                                  theme.palette.grey[300],
-                                cursor: canExpand ? "pointer" : "normal",
-                              }}
-                              onClick={row.getToggleExpandedHandler()}
-                            />
-                          )}
-                          {row.getVisibleCells().map((cell) => {
-                            if (!cell.getIsGrouped()) {
-                              return null;
-                            }
-                            return (
-                              <Fragment key={cell.id}>
-                                <TableCell
-                                  sx={{
-                                    backgroundColor: (theme) =>
-                                      theme.palette.grey[300],
-                                    cursor: canExpand ? "pointer" : "normal",
-                                  }}
-                                  onClick={row.getToggleExpandedHandler()}
-                                  align="right"
-                                >
-                                  {row.getIsExpanded() ? (
-                                    <ExpandLessIcon />
-                                  ) : (
-                                    <ExpandMoreIcon />
-                                  )}
-                                </TableCell>
-                                <TableCell
-                                  key={cell.id}
-                                  sx={{
-                                    backgroundColor: (theme) =>
-                                      theme.palette.grey[300],
-                                    cursor: canExpand ? "pointer" : "normal",
-                                  }}
-                                  onClick={row.getToggleExpandedHandler()}
-                                  colSpan={totalColumns - 1}
-                                >
-                                  <Typography variant="body1" textAlign="start">
-                                    {flexRender(
-                                      cell.column.columnDef.cell,
-                                      cell.getContext(),
-                                    )}
-                                  </Typography>
-                                </TableCell>
-                              </Fragment>
-                            );
-
-                            return (
-                              <TableCell
-                                key={cell.id}
-                                sx={{
-                                  backgroundColor: (theme) =>
-                                    theme.palette.grey[300],
-                                  cursor: canExpand ? "pointer" : "normal",
-                                }}
-                                onClick={row.getToggleExpandedHandler()}
-                              >
-                                {cell.getIsAggregated() ? (
-                                  <Typography variant="body1" textAlign="start">
-                                    {flexRender(
-                                      cell.column.columnDef.aggregatedCell ??
-                                        cell.column.columnDef.cell,
-                                      cell.getContext(),
-                                    )}
-                                  </Typography>
-                                ) : cell.getIsPlaceholder() ? null : (
-                                  <Typography variant="body1" textAlign="start">
-                                    {flexRender(
-                                      cell.column.columnDef.cell,
-                                      cell.getContext(),
-                                    )}
-                                  </Typography>
-                                )}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRow>
-                      );
-                    }
-
                     return (
-                      <Fragment key={row.id}>
-                        <TableRow
-                          hover
-                          onContextMenu={(e) => {
-                            e.preventDefault();
-                            setOpenRowActions({
-                              row,
-                              position: { left: e.clientX, top: e.clientY },
-                            });
-                          }}
-                          onClick={() => setOpenRowDetails(row)}
-                        >
-                          {grouping.map((group) => (
-                            <TableCell
-                              key={group}
-                              sx={{
-                                width: 0,
-                                backgroundColor: (theme) =>
-                                  theme.palette.grey[300],
-                              }}
-                            />
-                          ))}
-                          <TableCell>
-                            <Checkbox
-                              size="small"
-                              sx={{ p: 0 }}
-                              checked={row.getIsSelected()}
-                              disabled={!row.getCanSelect()}
-                              indeterminate={row.getIsSomeSelected()}
-                              onChange={row.getToggleSelectedHandler()}
-                            />
-                          </TableCell>
-                          {row.getVisibleCells().map((cell) => {
-                            if (overflowColumnList.includes(cell.column.id)) {
-                              return null;
-                            }
-                            return (
-                              <TableCell key={cell.id}>
-                                <Typography textAlign="start">
-                                  {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext(),
-                                  )}
-                                </Typography>
-                              </TableCell>
-                            );
-                          })}
-                          {row.getCanExpand() &&
-                            !!overflowColumnList.length && (
-                              <TableCell>
-                                <IconButton
-                                  size="small"
-                                  sx={{ p: 0 }}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    row.toggleExpanded();
-                                  }}
-                                >
-                                  <MoreHorizIcon />
-                                </IconButton>
-                              </TableCell>
-                            )}
-                        </TableRow>
-                        {row.getIsExpanded() && (
-                          <TableRow>
-                            {!!grouping.length && (
-                              <TableCell
-                                colSpan={row.depth}
-                                sx={{
-                                  width: 0,
-                                  backgroundColor: (theme) =>
-                                    theme.palette.grey[300],
-                                }}
-                              />
-                            )}
-                            <TableCell colSpan={totalColumns - row.depth}>
-                              <Grid container>
-                                {overflowColumnList.map((columnId) => {
-                                  const column = table.getColumn(columnId);
-                                  if (!column) {
-                                    return null;
-                                  }
-                                  const cell = row
-                                    .getVisibleCells()
-                                    .find((cell) => cell.column === column);
-                                  if (!cell) {
-                                    return null;
-                                  }
-                                  return (
-                                    <Grid
-                                      key={columnId}
-                                      item
-                                      xs={12}
-                                      sm={6}
-                                      lg={3}
-                                    >
-                                      <Typography
-                                        variant="subtitle1"
-                                        textAlign="start"
-                                      >
-                                        {String(column.columnDef.header)}
-                                      </Typography>
-                                      <Typography
-                                        variant="body2"
-                                        textAlign="start"
-                                      >
-                                        {flexRender(
-                                          cell.column.columnDef.cell,
-                                          cell.getContext(),
-                                        )}
-                                      </Typography>
-                                    </Grid>
-                                  );
-                                })}
-                              </Grid>
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </Fragment>
+                      <TableNestedRow
+                        key={row.id}
+                        table={table}
+                        row={row}
+                        grouping={grouping}
+                        overflowColumnList={overflowColumnList}
+                        totalColumns={totalColumns}
+                        rowActions={rowActions}
+                      />
                     );
                   })}
                   <RowActionsPopover

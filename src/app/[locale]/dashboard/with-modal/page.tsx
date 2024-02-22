@@ -80,6 +80,12 @@ export default function Home() {
             {cell.getValue<string | undefined>()}
           </span>
         ),
+        aggregationFn: "count",
+        aggregatedCell: ({ getValue }) => (
+          <span>
+            {t("data.aggregations.count", { count: getValue<number>() })}
+          </span>
+        ),
         filterFn: "custom",
       },
       {
@@ -91,6 +97,12 @@ export default function Home() {
             {cell.getValue<string | undefined>()}
           </span>
         ),
+        aggregationFn: "count",
+        aggregatedCell: ({ getValue }) => (
+          <span>
+            {t("data.aggregations.count", { count: getValue<number>() })}
+          </span>
+        ),
         filterFn: "custom",
       },
       {
@@ -99,7 +111,12 @@ export default function Home() {
         header: t("data.columns.created-at"),
         cell: ({ cell }) =>
           cell.getValue<Date | undefined>()?.toLocaleDateString(localeCode),
-        aggregatedCell: () => undefined,
+        aggregationFn: "count",
+        aggregatedCell: ({ getValue }) => (
+          <span>
+            {t("data.aggregations.count", { count: getValue<number>() })}
+          </span>
+        ),
         enableColumnFilter: false,
         filterFn: "inNumberRange",
       },
@@ -109,7 +126,12 @@ export default function Home() {
         header: t("data.columns.updated-at"),
         cell: ({ cell }) =>
           cell.getValue<Date | undefined>()?.toLocaleDateString(localeCode),
-        aggregatedCell: () => undefined,
+        aggregationFn: "count",
+        aggregatedCell: ({ getValue }) => (
+          <span>
+            {t("data.aggregations.count", { count: getValue<number>() })}
+          </span>
+        ),
         enableColumnFilter: false,
         filterFn: "inNumberRange",
       },

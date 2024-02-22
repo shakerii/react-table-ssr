@@ -152,6 +152,8 @@ export const TableNestedRow = <TData,>({
   overflowColumnList,
   totalColumns,
 }: Props<TData>) => {
+  const [expanded, setExpanded] = useState(false);
+
   if (!row.getIsGrouped()) {
     return (
       <SimpleRow
@@ -165,60 +167,94 @@ export const TableNestedRow = <TData,>({
     );
   }
 
-  const canExpand = row.getCanExpand();
+  const cells = row.getVisibleCells();
+  const groupedCell = cells.find((cell) => cell.getIsGrouped());
+  if (!groupedCell) {
+    return null;
+  }
+  const aggregatedCells = cells.filter((cell) => cell.id !== groupedCell.id);
+
   return (
-    <TableRow key={row.id}>
-      {!!row.depth && (
+    <>
+      <TableRow>
+        {!!row.depth && (
+          <TableCell
+            colSpan={row.depth}
+            sx={{
+              width: 0,
+              backgroundColor: (theme) => theme.palette.grey[300],
+              cursor: "pointer",
+            }}
+            onClick={() => setExpanded((expanded) => !expanded)}
+          />
+        )}
         <TableCell
-          colSpan={row.depth}
+          sx={{
+            backgroundColor: (theme) => theme.palette.grey[300],
+            cursor: "pointer",
+          }}
+          onClick={() => setExpanded((expanded) => !expanded)}
+          align="right"
+        >
+          {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </TableCell>
+        <TableCell
+          sx={{
+            backgroundColor: (theme) => theme.palette.grey[300],
+            cursor: "pointer",
+          }}
+          onClick={() => setExpanded((expanded) => !expanded)}
+          colSpan={totalColumns - 1}
+        >
+          <Typography variant="body1" textAlign="start">
+            {flexRender(
+              groupedCell.column.columnDef.cell,
+              groupedCell.getContext(),
+            )}
+          </Typography>
+        </TableCell>
+      </TableRow>
+      {expanded &&
+        row.subRows.map((row) => {
+          return (
+            <TableNestedRow
+              key={row.id}
+              table={table}
+              row={row}
+              grouping={grouping}
+              overflowColumnList={overflowColumnList}
+              totalColumns={totalColumns}
+              rowActions={rowActions}
+            />
+          );
+        })}
+      <TableRow>
+        <TableCell
+          colSpan={row.depth + 1}
           sx={{
             width: 0,
             backgroundColor: (theme) => theme.palette.grey[300],
-            cursor: canExpand ? "pointer" : "normal",
+            cursor: "pointer",
           }}
-          onClick={row.getToggleExpandedHandler()}
+          onClick={() => setExpanded((expanded) => !expanded)}
         />
-      )}
-      {row.getVisibleCells().map((cell) => {
-        if (!cell.getIsGrouped()) {
-          return null;
-        }
-        return (
-          <Fragment key={cell.id}>
-            <TableCell
-              sx={{
-                backgroundColor: (theme) => theme.palette.grey[300],
-                cursor: canExpand ? "pointer" : "normal",
-              }}
-              onClick={row.getToggleExpandedHandler()}
-              align="right"
-            >
-              {row.getIsExpanded() ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </TableCell>
-            <TableCell
-              key={cell.id}
-              sx={{
-                backgroundColor: (theme) => theme.palette.grey[300],
-                cursor: canExpand ? "pointer" : "normal",
-              }}
-              onClick={row.getToggleExpandedHandler()}
-              colSpan={totalColumns - 1}
-            >
-              <Typography variant="body1" textAlign="start">
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Typography>
-            </TableCell>
-          </Fragment>
-        );
-
-        return (
+        {!!(totalColumns - aggregatedCells.length - row.depth - 1) && (
+          <TableCell
+            colSpan={totalColumns - aggregatedCells.length - row.depth - 1}
+            sx={{
+              width: 0,
+              backgroundColor: (theme) => theme.palette.grey[500],
+              cursor: "pointer",
+            }}
+            onClick={() => setExpanded((expanded) => !expanded)}
+          />
+        )}
+        {aggregatedCells.map((cell) => (
           <TableCell
             key={cell.id}
             sx={{
-              backgroundColor: (theme) => theme.palette.grey[300],
-              cursor: canExpand ? "pointer" : "normal",
+              backgroundColor: (theme) => theme.palette.grey[500],
             }}
-            onClick={row.getToggleExpandedHandler()}
           >
             {cell.getIsAggregated() ? (
               <Typography variant="body1" textAlign="start">
@@ -234,8 +270,9 @@ export const TableNestedRow = <TData,>({
               </Typography>
             )}
           </TableCell>
-        );
-      })}
-    </TableRow>
+        ))}
+      </TableRow>
+      <TableRow sx={{ height: 2 }}></TableRow>
+    </>
   );
 };
