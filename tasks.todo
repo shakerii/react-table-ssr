@@ -4,7 +4,7 @@ Data table:
     ✔ Detailed row modal @done (2/21/2024, 3:03:23 PM)
     ✔ Smaller filter input widths @done (2/21/2024, 2:21:41 PM)
     ✔ Stretch data table to full screen @done (2/21/2024, 2:14:47 PM)
+    ✔ Save visible columns @done (2/22/2024, 2:08:31 PM)
     ☐ Add Date filter
-    ☐ Save visible columns
     ☐ + Zoom table to full screen
     ☐ + Change export libraries to : jspdf, file-saver-es, exceljs
