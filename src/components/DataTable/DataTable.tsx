@@ -60,6 +60,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { useIsRTL } from "~/hooks/useIsRTL";
+import { useLocalStorage } from "~/hooks/useLocalStorage";
 
 import { GroupedHeaderBox } from "./GroupedHeaderBox";
 import { HeaderCell } from "./HeaderCell";
@@ -107,7 +108,8 @@ export const DataTable = <TData,>({
   const [grouping, setGrouping] = useState<GroupingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] =
+    useLocalStorage<VisibilityState>("columnVisibility", {});
   const [columnSelectorAnchorEl, setColumnSelectorAnchorEl] =
     useState<Element>();
   const [overflowColumnList, setOverflowColumnList] = useState<string[]>([]);
