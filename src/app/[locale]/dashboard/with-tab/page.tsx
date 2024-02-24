@@ -119,7 +119,7 @@ export default function Home() {
           </span>
         ),
         enableColumnFilter: false,
-        filterFn: "inNumberRange",
+        filterFn: "date",
       },
       {
         id: "updatedAt",
@@ -134,7 +134,7 @@ export default function Home() {
           </span>
         ),
         enableColumnFilter: false,
-        filterFn: "inNumberRange",
+        filterFn: "date",
       },
     ];
   }, [t, localeCode]);

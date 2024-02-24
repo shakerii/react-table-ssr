@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { useTextDirection } from "~/hooks/useTextDirection";
 import "~/styles/globals.css";
 import { TRPCReactProvider } from "~/trpc/react";
-import { local } from "~/utils/fonts";
+import { local, roboto } from "~/utils/fonts";
 import { ltrTheme, rtlTheme } from "~/utils/theme";
 
 export const generateMetadata = async ({
@@ -34,7 +34,9 @@ export default function RootLayout({
 
   return (
     <html lang={locale} dir={direction}>
-      <body className={local.className}>
+      <body
+        className={direction === "rtl" ? local.className : roboto.className}
+      >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <TRPCReactProvider>
             <AppRouterCacheProvider>
