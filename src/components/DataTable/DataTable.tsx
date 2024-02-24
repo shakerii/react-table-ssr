@@ -275,7 +275,16 @@ export const DataTable = <TData,>({
           flexDirection: "column",
           overflow: "hidden",
           px: 2,
+          ...(isZoomFullScreen
+            ? {
+                position: "fixed",
+                zIndex: 100,
+                inset: 0,
+                borderRadius: 0,
+              }
+            : {}),
         }}
+        id="1234"
       >
         <TableActions
           table={table}

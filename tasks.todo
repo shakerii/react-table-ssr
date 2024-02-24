@@ -6,5 +6,5 @@ Data table:
     ✔ Stretch data table to full screen @done (2/21/2024, 2:14:47 PM)
     ✔ Save visible columns @done (2/22/2024, 2:08:31 PM)
     ☐ Add Date filter
-    ☐ + Zoom table to full screen
+    ✔ Zoom table to full screen @done (2/24/2024, 12:04:30 PM)
     ☐ + Change export libraries to : jspdf, file-saver-es, exceljs
