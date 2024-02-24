@@ -59,7 +59,10 @@
           "search": "Search",
           "contains": "Contains",
           "not-contains": "Not Contains",
-          "equals": "Equals"
+          "equals": "Equals",
+          "less-than": "Less Than",
+          "more-than": "More Than",
+          "between": "Between"
         }
       }
     },

@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.date-filter-input {
+  flex: 1;
+  text-align: center;
+  border: 1px solid #dedede;
+  box-sizing: content-box;
+  background: none;
+  height: 1.4375em;
+  margin: 0;
+  width: 100%;
+  position: relative;
+  border-radius: 4px;
+  min-width: 75px;
+  padding: 5px 10px;
+}

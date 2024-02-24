@@ -70,6 +70,7 @@ import { TableNestedRow } from "./TableNestedRow";
 import { customFilter } from "./TextFilterInput";
 import type { Columns, RowAction } from "./types";
 import {
+  dateFilter,
   exportRowsToCSV,
   exportRowsToPDF,
   fuzzyFilter,
@@ -143,6 +144,7 @@ export const DataTable = <TData,>({
     },
     filterFns: {
       fuzzy: fuzzyFilter,
+      date: dateFilter,
       custom: customFilter,
     },
     sortingFns: {

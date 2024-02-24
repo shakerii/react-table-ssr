@@ -59,7 +59,10 @@
           "search": "جست‌وجو",
           "contains": "شامل باشد",
           "not-contains": "شامل نباشد",
-          "equals": "مساوی باشد"
+          "equals": "مساوی باشد",
+          "less-than": "کمتر از",
+          "more-than": "بیشتر از",
+          "between": "در بازه‌ی"
         }
       }
     },

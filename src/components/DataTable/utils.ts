@@ -1,6 +1,5 @@
 import { compareItems, rankItem } from "@tanstack/match-sorter-utils";
 import {
-  type Cell,
   type FilterMeta,
   type Header,
   type Row,
@@ -9,6 +8,8 @@ import {
 import { download, generateCsv, mkConfig } from "export-to-csv";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+
+import type { MinMax } from "./types";
 
 export const fuzzyFilter = <TData>(
   row: Row<TData>,
@@ -37,13 +38,27 @@ export const fuzzySort = <TData>(
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-export const getTableCellBackgroundColor = <TData>(
-  cell: Cell<TData, unknown>,
+export const dateFilter = <TData>(
+  row: Row<TData>,
+  columnId: string,
+  filterValue: MinMax,
 ) => {
-  if (cell.getIsGrouped()) return "#EEE";
-  if (cell.getIsAggregated()) return "#BBB";
-  if (cell.getIsPlaceholder()) return "#999";
-  return "#fff";
+  const [min, max] = filterValue;
+  const value = row.getValue<Date>(columnId);
+
+  if (min && max) {
+    return value <= new Date(max) && value >= new Date(min);
+  }
+
+  if (max) {
+    return value <= new Date(max);
+  }
+
+  if (min) {
+    return value >= new Date(min);
+  }
+
+  return true;
 };
 
 export const exportRowsToPDF = <TData>({

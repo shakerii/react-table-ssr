@@ -1,65 +1,150 @@
-import { Grid } from "@mui/material";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import { Box, IconButton, ListItemText, Menu, MenuItem } from "@mui/material";
 import type { Column } from "@tanstack/react-table";
-import { useCallback } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { type ComponentProps, useMemo, useState } from "react";
+import { DatePicker } from "zaman";
 
-import { DebouncedInput } from "../DebouncedInput";
-
-type MinMax = [number | undefined, number | undefined];
+import { type MinMax } from "./types";
 
 type Props<TData> = {
   column: Column<TData, unknown>;
 };
 
-// TODO fix this
-export const DateFilterInput = <TData,>({ column }: Props<TData>) => {
-  const columnFilterValue = column.getFilterValue();
-  const minmaxValue = column.getFacetedMinMaxValues();
+type Locale = ComponentProps<typeof DatePicker>["locale"];
 
-  const handleMinChange = useCallback(
-    (value: string | number) => {
-      column.setFilterValue((old: MinMax) => [value, old?.[1]]);
-    },
-    [column],
-  );
+type FilterOption = "lt" | "mt" | "bw";
 
-  const handleMaxChange = useCallback(
-    (value: string | number) => {
-      column.setFilterValue((old: MinMax) => [old?.[0], value]);
-    },
-    [column],
-  );
+const FilterInput = ({
+  filterOption,
+  filterValue,
+  onChange,
+}: {
+  filterOption: FilterOption;
+  filterValue: MinMax;
+  onChange: (newValue: MinMax) => void;
+}) => {
+  const locale = useLocale();
+
+  const minValue = filterValue?.[0];
+  const maxValue = filterValue?.[1];
+
+  if (filterOption === "bw") {
+    const rangeValue = [] as Date[];
+    console.group("Date");
+    console.log({ rangeValue });
+    if (minValue) rangeValue.push(new Date(minValue));
+    console.log({ rangeValue });
+    if (maxValue) rangeValue.push(new Date(maxValue));
+    console.log({ rangeValue });
+    console.groupEnd();
+
+    return (
+      <DatePicker
+        inputClass="date-filter-input"
+        round="x4"
+        rangeValue={rangeValue}
+        position="center"
+        range
+        onChange={({ from, to }) => {
+          onChange([from.getTime(), to.getTime()]);
+        }}
+        locale={locale as Locale}
+      />
+    );
+  }
 
   return (
-    <Grid
-      container
-      justifyContent="space-between"
+    <DatePicker
+      inputClass="date-filter-input"
+      round="x4"
+      position="center"
+      defaultValue={filterOption === "lt" ? maxValue : minValue}
+      onChange={({ value }) => {
+        onChange(
+          filterOption === "lt"
+            ? [undefined, value.getTime()]
+            : [value.getTime(), undefined],
+        );
+      }}
+      locale={locale as Locale}
+    />
+  );
+};
+
+export const DateFilterInput = <TData,>({ column }: Props<TData>) => {
+  const t = useTranslations("components.data-table.header.filters");
+
+  const [filterAnchorEl, setFilterAnchorEl] = useState<HTMLElement | null>(
+    null,
+  );
+  const filterOpen = Boolean(filterAnchorEl);
+  const columnFilterValue = column.getFilterValue() as MinMax;
+
+  const [filterOption, setFilterOption] = useState<FilterOption>("bw");
+
+  const filterOptions = useMemo(() => {
+    return [
+      {
+        label: t("less-than"),
+        value: "lt",
+      },
+      {
+        label: t("more-than"),
+        value: "mt",
+      },
+      {
+        label: t("between"),
+        value: "bw",
+      },
+    ] as const;
+  }, [t]);
+
+  const handleClickFilter = (event: React.MouseEvent<HTMLElement>) => {
+    setFilterAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseFilter = () => {
+    setFilterAnchorEl(null);
+  };
+
+  return (
+    <Box
+      display="flex"
       alignItems="center"
       flexWrap="nowrap"
       width="100%"
       gap={1}
     >
-      <Grid item>
-        <DebouncedInput
-          type="date"
-          size="small"
-          fullWidth
-          inputProps={{ style: { minWidth: 75, padding: "5px 10px" } }}
-          value={(columnFilterValue as MinMax)?.[0] ?? ""}
-          onChange={handleMinChange}
-          placeholder={`Min ${minmaxValue?.[0] ? `(${minmaxValue?.[0]})` : ""}`}
-        />
-      </Grid>
-      <Grid item>
-        <DebouncedInput
-          type="date"
-          size="small"
-          fullWidth
-          inputProps={{ style: { minWidth: 75, padding: "5px 10px" } }}
-          value={(columnFilterValue as MinMax)?.[1] ?? ""}
-          onChange={handleMaxChange}
-          placeholder={`Max ${minmaxValue?.[1] ? `(${minmaxValue?.[1]})` : ""}`}
-        />
-      </Grid>
-    </Grid>
+      <FilterInput
+        filterOption={filterOption}
+        filterValue={columnFilterValue}
+        onChange={(value) => column.setFilterValue(value)}
+      />
+      <IconButton size="small" onClick={handleClickFilter}>
+        <FilterAltIcon fontSize="small" />
+      </IconButton>
+      <Menu
+        anchorEl={filterAnchorEl}
+        open={filterOpen}
+        onClose={handleCloseFilter}
+        onClick={handleCloseFilter}
+      >
+        {filterOptions.map(({ label, value }) => {
+          return (
+            <MenuItem
+              key={value}
+              selected={value === filterOption}
+              onClick={() => {
+                column.setFilterValue(undefined);
+                setFilterOption(value);
+              }}
+            >
+              <ListItemText>{label}</ListItemText>
+            </MenuItem>
+          );
+        })}
+      </Menu>
+    </Box>
   );
 };
