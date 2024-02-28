@@ -286,7 +286,6 @@ export const DataTable = <TData,>({
               }
             : {}),
         }}
-        id="1234"
       >
         <TableActions
           table={table}
@@ -363,6 +362,7 @@ export const DataTable = <TData,>({
                         overflowColumnList={overflowColumnList}
                         totalColumns={totalColumns}
                         rowActions={rowActions}
+                        showRowDetails={(row) => setOpenRowDetails(row)}
                       />
                     );
                   })}
@@ -381,13 +381,15 @@ export const DataTable = <TData,>({
               key={openRowDetails?.id}
               borderRight={isRTL ? 1 : 0}
               borderLeft={isRTL ? 0 : 1}
-              borderBottom={1}
               borderColor={(theme) => theme.palette.grey[300]}
             >
               <DialogTitle display="flex" justifyContent="start" sx={{ p: 1 }}>
                 <IconButton
                   size="small"
-                  onClick={() => setOpenRowDetails(undefined)}
+                  onClick={() => {
+                    setOpenRowDetails(undefined);
+                    setPinRowDetails(false);
+                  }}
                 >
                   <CloseIcon />
                 </IconButton>
@@ -411,6 +413,7 @@ export const DataTable = <TData,>({
                 style: {
                   position: "absolute",
                   width: isSmUp ? "max-content" : "100%",
+                  minWidth: 400,
                 },
               }}
               ModalProps={{
@@ -421,16 +424,21 @@ export const DataTable = <TData,>({
               <DialogTitle display="flex" justifyContent="start" sx={{ p: 0 }}>
                 <IconButton
                   size="small"
-                  onClick={() => setOpenRowDetails(undefined)}
+                  onClick={() => {
+                    setOpenRowDetails(undefined);
+                    setPinRowDetails(false);
+                  }}
                 >
                   <CloseIcon />
                 </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => setPinRowDetails((pin) => !pin)}
-                >
-                  {pinRowDetails ? <PushPinIcon /> : <PushPinOutlinedIcon />}
-                </IconButton>
+                {isSmUp && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setPinRowDetails((pin) => !pin)}
+                  >
+                    {pinRowDetails ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                  </IconButton>
+                )}
               </DialogTitle>
               <DialogContent sx={{ p: 0 }}>
                 {openRowDetails && <DetailComponent row={openRowDetails} />}

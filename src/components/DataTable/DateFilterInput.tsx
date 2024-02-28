@@ -31,13 +31,8 @@ const FilterInput = ({
 
   if (filterOption === "bw") {
     const rangeValue = [] as Date[];
-    console.group("Date");
-    console.log({ rangeValue });
     if (minValue) rangeValue.push(new Date(minValue));
-    console.log({ rangeValue });
     if (maxValue) rangeValue.push(new Date(maxValue));
-    console.log({ rangeValue });
-    console.groupEnd();
 
     return (
       <DatePicker

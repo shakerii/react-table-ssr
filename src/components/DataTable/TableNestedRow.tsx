@@ -22,6 +22,7 @@ type Props<TData> = {
   totalColumns: number;
   overflowColumnList: string[];
   rowActions: RowAction<TData>[];
+  showRowDetails: (row: Row<TData>) => void;
 };
 
 const SimpleRow = <TData,>({
@@ -31,6 +32,7 @@ const SimpleRow = <TData,>({
   overflowColumnList,
   totalColumns,
   rowActions,
+  showRowDetails,
 }: Props<TData>) => {
   const [openRowActions, setOpenRowActions] = useState<{
     position: { top: number; left: number };
@@ -41,6 +43,7 @@ const SimpleRow = <TData,>({
     <Fragment>
       <TableRow
         hover
+        onClick={() => showRowDetails(row)}
         onContextMenu={(e) => {
           e.preventDefault();
           setOpenRowActions({
@@ -151,6 +154,7 @@ export const TableNestedRow = <TData,>({
   grouping,
   overflowColumnList,
   totalColumns,
+  showRowDetails,
 }: Props<TData>) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -159,6 +163,7 @@ export const TableNestedRow = <TData,>({
       <SimpleRow
         table={table}
         row={row}
+        showRowDetails={showRowDetails}
         totalColumns={totalColumns}
         grouping={grouping}
         overflowColumnList={overflowColumnList}
@@ -225,6 +230,7 @@ export const TableNestedRow = <TData,>({
               overflowColumnList={overflowColumnList}
               totalColumns={totalColumns}
               rowActions={rowActions}
+              showRowDetails={showRowDetails}
             />
           );
         })}

@@ -112,10 +112,10 @@ export default function Home() {
         header: t("data.columns.created-at"),
         cell: ({ cell }) =>
           cell.getValue<Date | undefined>()?.toLocaleDateString(localeCode),
-        aggregationFn: "count",
+        aggregationFn: "min",
         aggregatedCell: ({ getValue }) => (
           <span>
-            {t("data.aggregations.count", { count: getValue<number>() })}
+            {new Date(getValue<number>())?.toLocaleDateString(localeCode)}
           </span>
         ),
         enableColumnFilter: false,
@@ -242,15 +242,17 @@ export default function Home() {
               exportToPDF
               onCreate={handleCreate}
               DetailComponent={({ row }) => (
-                <ProductForm
-                  defaultValues={row.original}
-                  onSubmit={(value) =>
-                    updatePropertyMutation.mutate({
-                      id: row.original.id,
-                      ...value,
-                    })
-                  }
-                />
+                <Box pt={2} px={2}>
+                  <ProductForm
+                    defaultValues={row.original}
+                    onSubmit={(value) =>
+                      updatePropertyMutation.mutate({
+                        id: row.original.id,
+                        ...value,
+                      })
+                    }
+                  />
+                </Box>
               )}
               onRefresh={() => getAllProductQuery.refetch()}
             />

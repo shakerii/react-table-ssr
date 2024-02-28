@@ -203,7 +203,7 @@ export default function Home() {
         exportToCSV
         exportToPDF
         DetailComponent={({ row }) => (
-          <Box pt={2} px={2} minWidth={400}>
+          <Box pt={2} px={2}>
             <ProductForm
               defaultValues={row.original}
               onSubmit={(value) =>

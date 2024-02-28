@@ -8,3 +8,15 @@ Data table:
     ✔ Add Date filter @done (2/24/2024, 3:44:44 PM)
     ✔ Zoom table to full screen @done (2/24/2024, 12:04:30 PM)
     ☐ + Change export libraries to : jspdf, file-saver-es, exceljs
+
+
+    Pin and Close @done
+    Column visibility in mobile
+    Custom event driven : Right-click / onRowClick => open details
+
+    NEW:
+    Login form
+    Dashboard
+        - search menu
+        - menu shortcuts
+        - diagram sample
